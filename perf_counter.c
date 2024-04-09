@@ -127,6 +127,11 @@ void perfc_port_insert_to_system_timer_insert_ovf_handler(void)
 
 }
 
+uint32_t perfc_get_systimer_frequency(void)
+{
+    return perfc_port_get_system_timer_freq();
+}
+
 __WEAK
 void __perf_os_patch_init(void)
 {
@@ -157,7 +162,8 @@ bool init_cycle_counter(bool bIsSysTickOccupied)
     s_lSystemClockCounts = 0;                       // reset system cycle counter
     s_lSystemMS = 0;                                // reset system millisecond counter
     s_lSystemUS = 0;                                // reset system microsecond counter
-
+    s_lOldTimestamp = 0;
+    
     __perf_os_patch_init();
     
     return bResult;

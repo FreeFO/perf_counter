@@ -670,6 +670,12 @@ int64_t stop_cycle_counter(void)
  */
 
 /*!
+ * \brief get the system timer frequency
+ * \return uint32_t the system timer frequency in Hz
+ */
+extern uint32_t perfc_get_systimer_frequency(void);
+
+/*!
  * \brief get the elapsed milliseconds since perf_counter is initialised
  * \return int64_t the elapsed milliseconds
  */
