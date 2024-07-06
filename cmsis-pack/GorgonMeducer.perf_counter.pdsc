@@ -16,6 +16,11 @@
   <repository type="git">https://github.com/GorgonMeducer/perf_counter.git</repository>
   
   <releases>
+    <release date="2024-07-06" version="2.3.2" tag="v2.3.2" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.3.2/GorgonMeducer.perf_counter.2.3.2.pack">
+      Release v2.3.2
+      - Adds __perfc_sync_barrier__() and improves __cycleof__()
+      - Some minor fixes
+    </release>
     <release date="2024-03-12" version="2.3.1" tag="v2.3.1" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.3.1/GorgonMeducer.perf_counter.2.3.1.pack">
       Release v2.3.1
       - Fixed PMU-SysTick-overflow-miscounting issue
@@ -28,7 +33,7 @@
           * Add __cpu_perf__() for CPI and L1 DCache miss rate
       - Some other minor changes.
     </release>
-    <release date="2023-10-19" version="2.2.4" tag="2.2.4" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.2.4/GorgonMeducer.perf_counter.2.2.4.pack">
+    <release date="2023-10-19" version="2.2.4" tag="v2.2.4" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.2.4/GorgonMeducer.perf_counter.2.2.4.pack">
       - Add support for RT-Thread-nano
       - Add an API for checking stack overflow
       - Improve the support for the Arm Compiler 6.21
