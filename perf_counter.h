@@ -333,6 +333,17 @@ __super_loop_monitor__()
 __asm(".global __ensure_systick_wrapper\n\t");
 #   endif
 
+#ifndef __perfc_sync_barrier__
+
+/* default implementation */
+#if defined(__clang__) || __IS_COMPILER_GCC__
+#   define __perfc_sync_barrier__(...)      __sync_synchronize()
+#else
+#   define __perfc_sync_barrier__(...)
+#endif
+
+#endif
+
 #endif
 /*! @} */
 
@@ -358,7 +369,9 @@ __asm(".global __ensure_systick_wrapper\n\t");
  */
 #define __cycleof__(__STR, ...)                                                 \
             using(int64_t _ = get_system_ticks(), __cycle_count__ = _,          \
-                _=_, {                                                          \
+                {__perfc_sync_barrier__();},                                    \
+                {                                                               \
+                __perfc_sync_barrier__();                                       \
                 _ = get_system_ticks() - _ - g_nOffset;                         \
                 __cycle_count__ = _;                                            \
                 if (__PLOOC_VA_NUM_ARGS(__VA_ARGS__) == 0) {                    \

@@ -146,6 +146,7 @@ void update_perf_counter(void)
     
     __IRQ_SAFE {
         g_lLastTimeStamp = get_system_ticks();
+        __perfc_sync_barrier__();
         g_nOffset = get_system_ticks() - g_lLastTimeStamp;
     }
 }
