@@ -333,6 +333,8 @@ __super_loop_monitor__()
 __asm(".global __ensure_systick_wrapper\n\t");
 #   endif
 
+#endif
+
 #ifndef __perfc_sync_barrier__
 
 /* default implementation */
@@ -340,8 +342,6 @@ __asm(".global __ensure_systick_wrapper\n\t");
 #   define __perfc_sync_barrier__(...)      __sync_synchronize()
 #else
 #   define __perfc_sync_barrier__(...)
-#endif
-
 #endif
 
 #endif
