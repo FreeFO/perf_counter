@@ -257,6 +257,9 @@ extern "C" {
 #undef __with3
 #undef with
 
+#define __with1(__addr)                                                         \
+            using(__typeof__(*__addr) *_=(__addr))
+
 #define __with2(__type, __addr)                                                 \
             using(__type *_=(__addr))
 #define __with3(__type, __addr, __item)                                         \
@@ -277,6 +280,13 @@ extern "C" {
 #undef foreach2
 #undef foreach3
 #undef foreach
+
+#define foreach1(__array)                                                       \
+            using(__typeof__(__array[0]) *_ = __array)                          \
+            for (   uint_fast32_t SAFE_NAME(count) = dimof(__array);            \
+                    SAFE_NAME(count) > 0;                                       \
+                    _++, SAFE_NAME(count)--                                     \
+                )
 
 #define foreach2(__type, __array)                                               \
             using(__type *_ = __array)                                          \
