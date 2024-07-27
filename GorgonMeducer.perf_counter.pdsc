@@ -136,17 +136,25 @@
             <accept Tcompiler="GCC"/>
         </condition>
 
+        <condition id="Armv8.1-M Processors">
+            <accept  Dcore="ARMV81MML"/>
+            <accept  Dcore="Cortex-M55"/>
+            <accept  Dcore="Cortex-M85"/>
+            <accept  Dcore="Cortex-M52"/>
+        </condition>
+
         
         <condition id="Armv8-M Processors">
             <accept  Dcore="ARMV8MBL"/>
             <accept  Dcore="ARMV8MML"/>
-            <accept  Dcore="ARMV81MML"/>
+
             <accept  Dcore="Star-MC1"/>
             <accept  Dcore="Cortex-M23"/>
             <accept  Dcore="Cortex-M33"/>
             <accept  Dcore="Cortex-M35P"/>
-            <accept  Dcore="Cortex-M55"/>
-            <accept  Dcore="Cortex-M85"/>
+            
+            <accept condition="Armv8.1-M Processors"/>
+
         </condition>
 
         <condition id="Previous Generation Cortex-M Processors">
@@ -191,12 +199,7 @@
         <condition id="PMU Devices">
             <description>Require Perf_Counter Core</description>
             <require condition="perf_counter" />
-            <accept  Dcore="ARMV8MML"/>
-            <accept  Dcore="ARMV81MML"/>
-            <accept  Dcore="Cortex-M33"/>
-            <accept  Dcore="Cortex-M35P"/>
-            <accept  Dcore="Cortex-M55"/>
-            <accept  Dcore="Cortex-M85"/>
+            <require condition="Armv8.1-M Processors" />
         </condition>
 
         <condition id="Cortex-M Arm GCC">
