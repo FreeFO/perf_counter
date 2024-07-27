@@ -125,6 +125,13 @@
   </keywords>
   
     <conditions> 
+    
+        <condition id="Arm Compiler 6">
+            <description>Arm Compiler 6 (armclang).</description>
+            <accept Tcompiler="ARMCC" Toptions="AC6"/>
+            <accept Tcompiler="ARMCC" Toptions="AC6LTO"/>
+        </condition>
+    
         <condition id="Arm Compiler">
             <description>Arm Compiler 5 (armcc) or Arm Compiler 6 (armclang).</description>
             <accept Tcompiler="ARMCC" Toptions="AC6"/>
@@ -240,17 +247,17 @@
         </condition>
         
         <condition id="Previous Generation Cortex-M Arm Compiler CMSIS-CORE Default Porting">
-            <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
-            <require condition="Arm Compiler"/>
+            <description>Compile Cortex-M Processors with Arm Compiler 5.</description>
+            <require Tcompiler="ARMCC" Toptions="AC5"/>
             <require condition="Previous Generation Cortex-M Processors"/>
             <require condition="CMSIS-CORE"/>
             <require condition="Default Porting"/>
         </condition>
         
         <condition id="Armv8-M Arm Compiler CMSIS-CORE Default Porting">
-            <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
-            <require condition="Arm Compiler"/>
-            <require condition="Armv8-M Processors"/>
+            <description>Compile Cortex-M Processors with Arm Compiler 6.</description>
+            <require condition="Arm Compiler 6"/>
+            <require condition="Cortex-M Processors"/>
             <require condition="CMSIS-CORE"/>
             <require condition="Default Porting"/>
         </condition>
