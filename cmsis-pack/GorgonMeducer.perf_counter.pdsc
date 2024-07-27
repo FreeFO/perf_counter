@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<package schemaVersion="1.7.28" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.28/schema/PACK.xsd">
+<package schemaVersion="1.7.37" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.37/schema/PACK.xsd">
   <vendor>GorgonMeducer</vendor>
   <name>perf_counter</name>
   <description>A dedicated performance counter for the Cortex-M Systick. It shares the SysTick with users' original SysTick function without interfering with it. This library will bring new functionalities, such as performance counter, APIs for delay, clock() defined in time.h etc.</description>
@@ -16,6 +16,12 @@
   <repository type="git">https://github.com/GorgonMeducer/perf_counter.git</repository>
   
   <releases>
+    <release date="2024-07-27" version="2.3.3" tag="v2.3.3" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.3.3/GorgonMeducer.perf_counter.2.3.3.pack">
+      Release v2.3.3
+      - Enhance foreach() and with() with __typeof__()
+      - Always use systick_wrapper_gnu.s when Arm Compiler 6 is detected
+      - Some minor fixes
+    </release>
     <release date="2024-07-06" version="2.3.2" tag="v2.3.2" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.3.2/GorgonMeducer.perf_counter.2.3.2.pack">
       Release v2.3.2
       - Adds __perfc_sync_barrier__() and improves __cycleof__()
@@ -125,6 +131,13 @@
   </keywords>
   
     <conditions> 
+    
+        <condition id="Arm Compiler 6">
+            <description>Arm Compiler 6 (armclang).</description>
+            <accept Tcompiler="ARMCC" Toptions="AC6"/>
+            <accept Tcompiler="ARMCC" Toptions="AC6LTO"/>
+        </condition>
+    
         <condition id="Arm Compiler">
             <description>Arm Compiler 5 (armcc) or Arm Compiler 6 (armclang).</description>
             <accept Tcompiler="ARMCC" Toptions="AC6"/>
@@ -136,17 +149,25 @@
             <accept Tcompiler="GCC"/>
         </condition>
 
+        <condition id="Armv8.1-M Processors">
+            <accept  Dcore="ARMV81MML"/>
+            <accept  Dcore="Cortex-M55"/>
+            <accept  Dcore="Cortex-M85"/>
+            <accept  Dcore="Cortex-M52"/>
+        </condition>
+
         
         <condition id="Armv8-M Processors">
             <accept  Dcore="ARMV8MBL"/>
             <accept  Dcore="ARMV8MML"/>
-            <accept  Dcore="ARMV81MML"/>
+
             <accept  Dcore="Star-MC1"/>
             <accept  Dcore="Cortex-M23"/>
             <accept  Dcore="Cortex-M33"/>
             <accept  Dcore="Cortex-M35P"/>
-            <accept  Dcore="Cortex-M55"/>
-            <accept  Dcore="Cortex-M85"/>
+            
+            <accept condition="Armv8.1-M Processors"/>
+
         </condition>
 
         <condition id="Previous Generation Cortex-M Processors">
@@ -191,12 +212,7 @@
         <condition id="PMU Devices">
             <description>Require Perf_Counter Core</description>
             <require condition="perf_counter" />
-            <accept  Dcore="ARMV8MML"/>
-            <accept  Dcore="ARMV81MML"/>
-            <accept  Dcore="Cortex-M33"/>
-            <accept  Dcore="Cortex-M35P"/>
-            <accept  Dcore="Cortex-M55"/>
-            <accept  Dcore="Cortex-M85"/>
+            <require condition="Armv8.1-M Processors" />
         </condition>
 
         <condition id="Cortex-M Arm GCC">
@@ -237,17 +253,17 @@
         </condition>
         
         <condition id="Previous Generation Cortex-M Arm Compiler CMSIS-CORE Default Porting">
-            <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
-            <require condition="Arm Compiler"/>
+            <description>Compile Cortex-M Processors with Arm Compiler 5.</description>
+            <require Tcompiler="ARMCC" Toptions="AC5"/>
             <require condition="Previous Generation Cortex-M Processors"/>
             <require condition="CMSIS-CORE"/>
             <require condition="Default Porting"/>
         </condition>
         
         <condition id="Armv8-M Arm Compiler CMSIS-CORE Default Porting">
-            <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
-            <require condition="Arm Compiler"/>
-            <require condition="Armv8-M Processors"/>
+            <description>Compile Cortex-M Processors with Arm Compiler 6.</description>
+            <require condition="Arm Compiler 6"/>
+            <require condition="Cortex-M Processors"/>
             <require condition="CMSIS-CORE"/>
             <require condition="Default Porting"/>
         </condition>
@@ -292,7 +308,7 @@
   -->
 
     <components>
-            <component Cclass="Utilities" Cversion="2.3.1" Cgroup="perf_counter" Csub="Core" Cvariant="Source" isDefaultVariant="true" condition="CMSIS-CORE">
+            <component Cclass="Utilities" Cversion="2.3.3" Cgroup="perf_counter" Csub="Core" Cvariant="Source" isDefaultVariant="true" condition="CMSIS-CORE">
               <description>A dedicated performance counter for Cortex-M systick.</description>
               <files>
                 <file category="header"         name="perf_counter.h"/>
@@ -313,7 +329,7 @@
               </Pre_Include_Global_h>
             </component>
 
-            <component Cclass="Utilities" Cversion="2.3.1" Cgroup="perf_counter" Csub="Core" Cvariant="SourceNoWrapper" isDefaultVariant="false" condition="CMSIS-CORE">
+            <component Cclass="Utilities" Cversion="2.3.3" Cgroup="perf_counter" Csub="Core" Cvariant="SourceNoWrapper" isDefaultVariant="false" condition="CMSIS-CORE">
               <description>A dedicated performance counter for Cortex-M systick.</description>
               <files>
                 <file category="header"         name="perf_counter.h"/>
@@ -390,7 +406,7 @@
               </Pre_Include_Global_h>
             </component>
 
-            <component Cclass="Utilities" Cversion="2.3.0" Cgroup="perf_counter" Csub="RTX5 Patch" condition="RTX5 Patch">
+            <component Cclass="Utilities" Cversion="2.3.3" Cgroup="perf_counter" Csub="RTX5 Patch" condition="RTX5 Patch">
               <description>A Patch for RTX5</description>
               <files>
                 <file category="source"     name="os/perf_os_patch_rtx5.c"/>
@@ -402,7 +418,7 @@
               </Pre_Include_Global_h>
             </component>
 
-            <component Cclass="Utilities" Cversion="2.3.0" Cgroup="perf_counter" Csub="FreeRTOS Patch" condition="perf_counter">
+            <component Cclass="Utilities" Cversion="2.3.3" Cgroup="perf_counter" Csub="FreeRTOS Patch" condition="perf_counter">
               <description>A Patch for FreeRTOS</description>
               <files>
                 <file category="sourceC"    name="os/perf_os_patch_freertos.c"/>
@@ -425,7 +441,7 @@ extern void __freertos_evr_on_task_switched_in(void *ptTCB, unsigned int uxTopPr
               </Pre_Include_Global_h>
             </component>
             
-            <component Cclass="Utilities" Cversion="2.3.0" Cgroup="perf_counter" Csub="RT-Thread Patch" condition="perf_counter">
+            <component Cclass="Utilities" Cversion="2.3.3" Cgroup="perf_counter" Csub="RT-Thread Patch" condition="perf_counter">
               <description>A Patch for RT-Thread</description>
               <files>
                 <file category="sourceC"    name="os/perf_os_patch_rt_thread.c"/>
@@ -443,7 +459,7 @@ extern void __rt_thread_scheduler_hook(struct rt_thread *from, struct rt_thread 
               </Pre_Include_Global_h>
             </component>
             
-            <component Cclass="Utilities" Cversion="2.3.0" Cgroup="perf_counter" Csub="ThreadX Patch" condition="perf_counter">
+            <component Cclass="Utilities" Cversion="2.3.3" Cgroup="perf_counter" Csub="ThreadX Patch" condition="perf_counter">
               <description>A Patch for ThreadX</description>
               <files>
                 <file category="sourceC"    name="os/perf_os_patch_threadx.c"/>

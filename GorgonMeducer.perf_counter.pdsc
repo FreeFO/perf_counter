@@ -16,6 +16,12 @@
   <repository type="git">https://github.com/GorgonMeducer/perf_counter.git</repository>
   
   <releases>
+    <release date="2024-07-27" version="2.3.3" tag="v2.3.3" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.3.3/GorgonMeducer.perf_counter.2.3.3.pack">
+      Release v2.3.3
+      - Enhance foreach() and with() with __typeof__()
+      - Always use systick_wrapper_gnu.s when Arm Compiler 6 is detected
+      - Some minor fixes
+    </release>
     <release date="2024-07-06" version="2.3.2" tag="v2.3.2" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.3.2/GorgonMeducer.perf_counter.2.3.2.pack">
       Release v2.3.2
       - Adds __perfc_sync_barrier__() and improves __cycleof__()
