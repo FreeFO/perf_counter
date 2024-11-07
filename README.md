@@ -145,13 +145,13 @@ void main(void)
     ...
     while (1) {
         
-        float fUsage = 0.0f;
         __cpu_usage__(10, {
-            fUsage = __usage__; /*< "__usage__" stores the result */
+            float fUsage = __usage__; /*< "__usage__" stores the result */
+            printf("task 1 cpu usage %3.2f %%\r\n", (double)fUsage);
         }) {
             delay_us(30000);
         }
-        printf("task 1 cpu usage %3.2f %%\r\n", (double)fUsage);
+        
 
         delay_us(70000);
     }
