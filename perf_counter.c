@@ -181,33 +181,22 @@ bool init_cycle_counter(bool bIsSysTickOccupied)
  */
 __STATIC_INLINE int64_t check_systick(void)
 {
-    int64_t lLoad = perfc_port_get_system_timer_top() + 1;
     int64_t lTemp = perfc_port_get_system_timer_elapsed();
 
     /*        Since we cannot stop counting temporarily, there are several
      *        conditions which we should take into consideration:
      *        - Condition 1: when assigning nTemp with the register value (LOAD-VAL),
      *            the underflow didn't happen but when we check the PENDSTSET bit,
-     *            the underflow happens, for this condition, we should not
-     *            do any compensation. When this happens, the (LOAD-nTemp) is
-     *            smaller than PERF_CNT_COMPENSATION_THRESHOLD (a small value) as
-     *            long as LOAD is bigger than (or equals to) the
-     *            PERF_CNT_COMPENSATION_THRESHOLD;
-     *        - Condition 2: when assigning nTemp with the register value (LOAD-VAL),
-     *            the VAL is zero and underflow happened and the PENDSTSET bit
-     *            is set, for this condition, we should not do any compensation.
-     *            When this happens, the (LOAD-nTemp) is equals to zero.
-     *        - Condition 3: when assigning nTemp with the register value (LOAD-VAL),
-     *            the underflow has already happened, hence the PENDSTSET
-     *            is set, for this condition, we should compensate the return
-     *            value. When this happens, the (LOAD-nTemp) is bigger than (or
-     *            equals to) PERF_CNT_COMPENSATION_THRESHOLD.
+     *            the underflow happens, for this condition, we should recall the
+     *            perfc_port_get_system_timer_elapsed().
      *        The following code implements an equivalent logic.
      */
     if (perfc_port_is_system_timer_ovf_pending()){
-        //if ((lLoad - lTemp) >= PERF_CNT_COMPENSATION_THRESHOLD) {
-            lTemp += lLoad;
-        //}
+        /* refresh the elapsed just in case the counter has just overflowed/underflowed
+         * after we called the perfc_port_get_system_timer_elapsed()
+         */
+        lTemp = perfc_port_get_system_timer_elapsed();
+        lTemp += perfc_port_get_system_timer_top() + 1;
     }
 
     return lTemp;
