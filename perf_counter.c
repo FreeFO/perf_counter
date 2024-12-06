@@ -102,29 +102,34 @@ void perfc_port_clear_system_timer_counter(void);
 void perfc_port_insert_to_system_timer_insert_ovf_handler(void)
 {
     int64_t lLoad = perfc_port_get_system_timer_top() + 1;
-    s_lSystemClockCounts += lLoad;
 
-    // update system ms counter
-    do {
-        int64_t lTemp = s_wMSResidule + lLoad;
+    /* prevent high priority exceptions from preempting the system timer OVF 
+     * exception handling
+     */
+    __IRQ_SAFE {
+        s_lSystemClockCounts += lLoad;
+
+        // update system ms counter
+        do {
+            int64_t lTemp = s_wMSResidule + lLoad;
         
-        int64_t lMS = lTemp / s_wMSUnit;
-        s_lSystemMS += lMS;
-        s_wMSResidule = (uint32_t)((int64_t)lTemp - (int64_t)lMS * s_wMSUnit);
+            int64_t lMS = lTemp / s_wMSUnit;
+            s_lSystemMS += lMS;
+            s_wMSResidule = (uint32_t)((int64_t)lTemp - (int64_t)lMS * s_wMSUnit);
 
-    } while(0);
+        } while(0);
 
-    // update system us counter
-    do {
-        int64_t lTemp = s_wUSResidule + lLoad;
+        // update system us counter
+        do {
+            int64_t lTemp = s_wUSResidule + lLoad;
         
-        int64_t lUS = lTemp / s_wUSUnit;
-        s_lSystemUS += lUS;
+            int64_t lUS = lTemp / s_wUSUnit;
+            s_lSystemUS += lUS;
 
-        s_wUSResidule = (uint32_t)((int64_t)lTemp - (int64_t)lUS * s_wUSUnit);
+            s_wUSResidule = (uint32_t)((int64_t)lTemp - (int64_t)lUS * s_wUSUnit);
 
-    } while(0);
-
+        } while(0);
+    }
 }
 
 uint32_t perfc_get_systimer_frequency(void)
