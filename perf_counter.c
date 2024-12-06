@@ -205,9 +205,9 @@ __STATIC_INLINE int64_t check_systick(void)
      *        The following code implements an equivalent logic.
      */
     if (perfc_port_is_system_timer_ovf_pending()){
-        if ((lLoad - lTemp) >= PERF_CNT_COMPENSATION_THRESHOLD) {
+        //if ((lLoad - lTemp) >= PERF_CNT_COMPENSATION_THRESHOLD) {
             lTemp += lLoad;
-        }
+        //}
     }
 
     return lTemp;
