@@ -17,10 +17,9 @@
   
   <releases>
     <release date="2024-12-08" version="2.4.0" tag="v2.4.0" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.4.0/GorgonMeducer.perf_counter.2.4.0.pack">
-      Release v2.4.0
-      - Avoid time roll-back in some corner cases
-      - Add macros for PT
-      - Some minor fixes
+      - Avoid time roll-back in some rare cases
+      - Add macros for protoThread
+      - Some minor changes
     </release>
     <release date="2024-07-27" version="2.3.3" tag="v2.3.3" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.3.3/GorgonMeducer.perf_counter.2.3.3.pack">
       Release v2.3.3
