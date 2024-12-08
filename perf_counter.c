@@ -64,9 +64,10 @@ struct __task_cycle_info_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-volatile int64_t g_lLastTimeStamp = 0;
+
 volatile static int64_t s_lOldTimestamp;
-volatile int32_t g_nOffset = 0;
+volatile static int64_t s_lOldTimestampUS;
+volatile static int64_t s_lOldTimestampMS;
 volatile static uint32_t s_wUSUnit = 1;
 volatile static uint32_t s_wMSUnit = 1;
 volatile static uint32_t s_wMSResidule = 0;
@@ -75,6 +76,9 @@ volatile static int64_t s_lSystemMS = 0;
 volatile static int64_t s_lSystemUS = 0;
 
 volatile static int64_t s_lSystemClockCounts = 0;
+
+volatile int32_t g_nOffset = 0;
+volatile int64_t g_lLastTimeStamp = 0;
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -112,22 +116,23 @@ void perfc_port_insert_to_system_timer_insert_ovf_handler(void)
         // update system ms counter
         do {
             int64_t lTemp = s_wMSResidule + lLoad;
-        
+
             int64_t lMS = lTemp / s_wMSUnit;
             s_lSystemMS += lMS;
             s_wMSResidule = (uint32_t)((int64_t)lTemp - (int64_t)lMS * s_wMSUnit);
 
         } while(0);
+    }
 
+    __IRQ_SAFE {
         // update system us counter
         do {
             int64_t lTemp = s_wUSResidule + lLoad;
-        
+
             int64_t lUS = lTemp / s_wUSUnit;
             s_lSystemUS += lUS;
 
             s_wUSResidule = (uint32_t)((int64_t)lTemp - (int64_t)lUS * s_wUSUnit);
-
         } while(0);
     }
 }
@@ -169,6 +174,8 @@ bool init_cycle_counter(bool bIsSysTickOccupied)
     s_lSystemMS = 0;                                // reset system millisecond counter
     s_lSystemUS = 0;                                // reset system microsecond counter
     s_lOldTimestamp = 0;
+    s_lOldTimestampUS = 0;
+    s_lOldTimestampMS = 0;
     
     __perf_os_patch_init();
     
@@ -322,7 +329,15 @@ int64_t get_system_ms(void)
     int64_t lTemp = 0;
 
     __IRQ_SAFE {
-        lTemp = s_lSystemMS + ((check_systick() + (int64_t)s_wMSResidule) / s_wMSUnit);
+        lTemp = s_lSystemMS 
+              + (   (check_systick() 
+                +   (int64_t)s_wMSResidule) / s_wMSUnit);
+
+        if (lTemp < s_lOldTimestampMS) {
+            lTemp = s_lOldTimestampMS;
+        } else {
+            s_lOldTimestampMS = lTemp;
+        }
     }
 
     return lTemp;
@@ -333,7 +348,16 @@ int64_t get_system_us(void)
     int64_t lTemp = 0;
 
     __IRQ_SAFE {
-        lTemp = s_lSystemUS + ((check_systick() + (int64_t)s_wUSResidule) / s_wUSUnit);
+        lTemp = s_lSystemUS 
+              + (   (check_systick() 
+                +   (int64_t)s_wUSResidule) / s_wUSUnit);
+
+        if (lTemp < s_lOldTimestampUS) {
+            lTemp = s_lOldTimestampUS;
+        } else {
+            s_lOldTimestampUS = lTemp;
+        }
+
     }
 
     return lTemp;
@@ -369,7 +393,6 @@ bool __perfc_is_time_out(int64_t lPeriod, int64_t *plTimestamp, bool bAutoReload
     }
     
     int64_t lTimestamp = get_system_ticks();
-
 
     if (0 == *plTimestamp) {
         *plTimestamp = lPeriod;
@@ -410,8 +433,6 @@ uint32_t EventRecorderTimerGetCount (void)
 {
     return get_system_ticks();
 }
-
-
 
 __WEAK
 task_cycle_info_t * get_rtos_task_cycle_info(void)
