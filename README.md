@@ -455,9 +455,9 @@ __super_loop_monitor__()
 
    
 
-3. Open the RTE management window, find the **Utilities** and select the **Core** inside perf_counter as shown below:
+3. Open the RTE management window, find the **Utilities** and select the **Core**::**Source** inside perf_counter as shown below:
 
-![](./documents/pictures\RTE) 
+![](./documents/pictures/RTE.png) 
 
 4. Include `perf_counter.h` in the corresponding c source file:
 
