@@ -39,13 +39,17 @@ A dedicated performance counter for Cortex-M Systick. It shares the SysTick with
   - Support stack-overflow detection in RTOS environment via `perfc_check_task_stack_canary_safe()`
 - **Utilities for C language enhancement**
   - Macros to detect compilers, e.g. `__IS_COMPILER_ARM_COMPILER_6__`, `__IS_COMPILER_LLVM__` etc.
+  - **[new**] Macros to detect compiler features: 
+    - `__COMPILER_HAS_GNU_EXTENSIONS__`
+    - `__IS_COMPILER_SUPPORT_C99__`
+    - `__IS_COMPILER_SUPPORT_C11__`
   - Macro to create atomicity for a specified code block, i.e. `__IRQ_SAFE{...}`.
   - Helper macros for C language extension:
     - VB like `with()`
-    - `foreach()`, dimof(), `CONNECT()`
+    - `foreach()`, `dimof(), `CONNECT()`
     - C# like `using()`
     - simple overload feature of OOPC made out of ANSI-C99, `__PLOOC_VA_NUM_ARGS()`.
-    - **[new]** add macros for PT
+    - add macros for PT
     - ...
   - A dedicated macro `__perfc_sync_barrier__()` for code barrier. 
 
