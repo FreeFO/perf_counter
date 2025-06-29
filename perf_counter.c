@@ -161,11 +161,12 @@ void update_perf_counter(void)
     }
 }
 
-bool init_cycle_counter(bool bIsSysTickOccupied)
+//bool init_cycle_counter(bool bIsSysTickOccupied)
+bool perfc_init(bool bIsSysTimerOccupied)
 {
     bool bResult = false;
     __IRQ_SAFE {
-        bResult = perfc_port_init_system_timer(bIsSysTickOccupied);             // use the longest period
+        bResult = perfc_port_init_system_timer(bIsSysTimerOccupied);            // use the longest period
         perfc_port_clear_system_timer_ovf_pending();
     }
     
@@ -229,11 +230,11 @@ void before_cycle_counter_reconfiguration(void)
 __attribute__((constructor))
 void __perf_counter_init(void)
 {
-    init_cycle_counter(true);
+    perfc_init(true);
 }
 
 
-void delay_us(uint32_t wUs)
+void perfc_delay_us(uint32_t wUs)
 {
     int64_t lUs = (int64_t)wUs * (int64_t)s_wUSUnit;
     int32_t iCompensate = g_nOffset > PERF_CNT_DELAY_US_COMPENSATION
@@ -250,7 +251,7 @@ void delay_us(uint32_t wUs)
     while(get_system_ticks() < lUs);
 }
 
-void delay_ms(uint32_t wMs)
+void perfc_delay_ms(uint32_t wMs)
 {
     int64_t lMs = (int64_t)wMs * (int64_t)s_wMSUnit;
     int32_t iCompensate = g_nOffset > PERF_CNT_DELAY_US_COMPENSATION

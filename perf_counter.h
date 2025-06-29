@@ -358,7 +358,20 @@ __asm(".global __ensure_systick_wrapper\n\t");
 #endif
 /*! @} */
 
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+/*!
+ * \addtogroup Deprecated
+ * @{
+ */
+#define init_cycle_counter(__is_systimer_occupied)                              \
+            perfc_init(__is_systimer_occupied)
+
+#define delay_us(__us)          perfc_delay_us(__us)
+
+#define delay_ms(__ms)          perfc_delay_ms(__ms)
+/*! @} */
 
 /*!
  * \addtogroup gBasic 1 Basic
@@ -847,13 +860,13 @@ extern int64_t get_system_us(void);
  * \brief delay specified time in microsecond
  * \param[in] wUs time in microsecond
  */
-extern void delay_us(uint32_t wUs);
+extern void perfc_delay_us(uint32_t wUs);
 
 /*!
  * \brief delay specified time in millisecond
  * \param[in] wMs time in millisecond
  */
-extern void delay_ms(uint32_t nMs);
+extern void perfc_delay_ms(uint32_t nMs);
 
 /*!
  * \brief convert ticks of a reference timer to millisecond
@@ -1077,8 +1090,7 @@ extern int64_t __stop_task_cycle_counter(task_cycle_info_t *ptInfo);
  *                available or IO error.
  *  \return true initialization is successful.
  */
-extern bool init_cycle_counter(bool bIsSysTickOccupied);
-
+extern bool perfc_init(bool bIsSysTimerOccupied);
 
 /*!
  * \brief a system timer overflow handler

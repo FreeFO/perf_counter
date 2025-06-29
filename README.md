@@ -49,6 +49,13 @@ A dedicated performance counter for Cortex-M Systick. It shares the SysTick with
     - ...
   - A dedicated macro `__perfc_sync_barrier__()` for code barrier. 
 
+### Updates
+
+- Following functions are deprecated, please use the version with `perfc_` as prefix:
+  - `init_cycle_counter()` -> `perfc_init()`
+  - `delay_us()` -> `perfc_delay_us()`
+  - `delay_ms()` -> `perfc_delay_ms()`
+
 
 
 ## 1. How To Use
