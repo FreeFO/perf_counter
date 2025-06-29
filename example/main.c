@@ -1,5 +1,5 @@
 /****************************************************************************
-*  Copyright 2021 Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)       *
+*  Copyright 2025 Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)       *
 *                                                                           *
 *  Licensed under the Apache License, Version 2.0 (the "License");          *
 *  you may not use this file except in compliance with the License.         *
@@ -21,6 +21,7 @@
 #include "perf_counter.h"
 #include <stdlib.h>
 
+#include "pt_example.h"
 
 #ifndef __PERF_CNT_USE_LONG_CLOCK__
 #include <time.h>
@@ -128,45 +129,9 @@ uint32_t calculate_stack_usage_bottomup(void)
   Main function
  *----------------------------------------------------------------------------*/
 
-typedef struct {
-    uint8_t chPT;
-    void *ptResource;
-} pt_led_flash_cb_t;
-
-#undef this
-#define this    (*ptThis)
-
-fsm_rt_t pt_example_led_flash(pt_led_flash_cb_t *ptThis)
-{
-
-PERFC_PT_BEGIN(this.chPT)
-
-    do {
-
-    PERFC_PT_WAIT_RESOURCE_UNTIL( 
-        (this.ptResource != NULL),               /* quit condition */
-        this.ptResource = malloc(100);          /* try to allocate memory */
-    )
-
-        printf("LED ON  [%lld]\r\n", get_system_ms());
-
-    PERFC_PT_DELAY_MS(500);
-        
-        printf("LED OFF [%lld]\r\n", get_system_ms());
-
-    PERFC_PT_DELAY_MS(500);
-        
-        free(this.ptResource);
-
-    } while(1);
-
-PERFC_PT_END()
-
-    return fsm_rt_cpl;
-
-}
-
-static pt_led_flash_cb_t s_tExamplePT = {0};
+static 
+PERFC_NOINIT
+pt_led_flash_cb_t s_tExamplePT;
 
 int main (void)
 {
@@ -230,6 +195,8 @@ int main (void)
 #ifdef __PERF_COUNTER_COREMARK__
     coremark_main();
 #endif
+
+    pt_example_led_flash_init(&s_tExamplePT);
 
     while (1) {
         if (perfc_is_time_out_ms(10000)) {

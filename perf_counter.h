@@ -89,17 +89,17 @@ extern "C" {
  * \brief an attribute for static variables that no initialisation is required 
  *        in the C startup process.
  */
-#ifndef PERF_NOINIT
+#ifndef PERFC_NOINIT
 #   if     defined(__IS_COMPILER_ARM_COMPILER_5__)
-#       define PERF_NOINIT   __attribute__(( section( ".bss.noinit"),zero_init))
+#       define PERFC_NOINIT   __attribute__(( section( ".bss.noinit"),zero_init))
 #   elif   defined(__IS_COMPILER_ARM_COMPILER_6__)
-#       define PERF_NOINIT   __attribute__(( section( ".bss.noinit")))
+#       define PERFC_NOINIT   __attribute__(( section( ".bss.noinit")))
 #   elif   defined(__IS_COMPILER_IAR__)
-#       define PERF_NOINIT   __no_init
+#       define PERFC_NOINIT   __no_init
 #   elif   (defined(__IS_COMPILER_GCC__) || defined(__IS_COMPILER_LLVM__)) && !defined(__APPLE__)
-#       define PERF_NOINIT   __attribute__(( section( ".bss.noinit")))
+#       define PERFC_NOINIT   __attribute__(( section( ".bss.noinit")))
 #   else
-#       define PERF_NOINIT
+#       define PERFC_NOINIT
 #   endif
 #endif
 
