@@ -31,45 +31,65 @@ extern "C" {
  */
 
 // for IAR
-#undef __IS_COMPILER_IAR__
 #if defined(__IAR_SYSTEMS_ICC__)
+#   undef __IS_COMPILER_IAR__
 #   define __IS_COMPILER_IAR__                  1
-#endif
+
+// TI Arm Compiler (armcl)
+#elif defined(__TI_ARM__)
+#   undef __IS_COMPILER_TI_ARM__
+#   define __IS_COMPILER_TI_ARM__               1
+
+// TASKING Compiler
+#elif defined(__TASKING__)
+#   undef __IS_COMPLER_TASKING__
+#   define __IS_COMPLER_TASKING__               1
+
+// COSMIC Compiler
+#elif defined ( __CSMC__ )
+#   undef __IS_COMPILER_COSMIC__
+#   define __IS_COMPILER_COSMIC__               1
 
 // for arm compiler 5
-#undef __IS_COMPILER_ARM_COMPILER_5__
-#if ((__ARMCC_VERSION >= 5000000) && (__ARMCC_VERSION < 6000000))
+#elif ((__ARMCC_VERSION >= 5000000) && (__ARMCC_VERSION < 6000000))
+#   undef __IS_COMPILER_ARM_COMPILER_5__
 #   define __IS_COMPILER_ARM_COMPILER_5__       1
-#endif
-
 
 //for arm compiler 6
-
-#undef __IS_COMPILER_ARM_COMPILER_6__
-#if defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
+#elif defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
+#   undef __IS_COMPILER_ARM_COMPILER_6__
 #   define __IS_COMPILER_ARM_COMPILER_6__       1
+
+// TI Arm Clang Compiler (tiarmclang)
+#elif defined(__ti__)
+#undef __IS_COMPILER_TI_ARM_CLANG__
+#   define __IS_COMPILER_TI_ARM_CLANG__         1
+#else
+
+// for other clang
+#   if defined(__clang__) &&                                                    \
+    !__IS_COMPILER_ARM_COMPILER_6__ &&                                          \
+    !__IS_COMPILER_TI_ARM_CLANG__
+#       undef  __IS_COMPILER_LLVM__
+#       define __IS_COMPILER_LLVM__                 1
+
+// for gcc
+#   elif defined(__GNUC__) && !(  defined(__IS_COMPILER_ARM_COMPILER__)         \
+                            ||  defined(__IS_COMPILER_LLVM__)                   \
+                            ||  defined(__IS_COMPILER_IAR__))
+#       undef __IS_COMPILER_GCC__
+#       define __IS_COMPILER_GCC__              1
+#   endif
+
 #endif
+
+
 #undef __IS_COMPILER_ARM_COMPILER__
 #if defined(__IS_COMPILER_ARM_COMPILER_5__) && __IS_COMPILER_ARM_COMPILER_5__   \
 ||  defined(__IS_COMPILER_ARM_COMPILER_6__) && __IS_COMPILER_ARM_COMPILER_6__
 #   define __IS_COMPILER_ARM_COMPILER__         1
 #endif
 
-// for clang
-#undef  __IS_COMPILER_LLVM__
-#if defined(__clang__) && !__IS_COMPILER_ARM_COMPILER_6__
-#   define __IS_COMPILER_LLVM__                 1
-#else
-
-// for gcc
-#   undef __IS_COMPILER_GCC__
-#   if defined(__GNUC__) && !(  defined(__IS_COMPILER_ARM_COMPILER__)           \
-                            ||  defined(__IS_COMPILER_LLVM__)                   \
-                            ||  defined(__IS_COMPILER_IAR__))
-#       define __IS_COMPILER_GCC__              1
-#   endif
-
-#endif
 
 #ifndef __PLOOC_VA_NUM_ARGS_IMPL
 #   define __PLOOC_VA_NUM_ARGS_IMPL( _0,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,     \
