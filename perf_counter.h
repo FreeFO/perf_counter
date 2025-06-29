@@ -280,7 +280,7 @@ extern "C" {
 #define user_code_insert_to_systick_handler                                     \
             perfc_port_insert_to_system_timer_insert_ovf_handler
 
-#if __PLOOC_VA_NUM_ARGS() != 0
+#if !__COMPILER_HAS_GNU_EXTENSIONS__
 #warning Please enable GNU extensions, it is required by __cycleof__() and \
 __super_loop_monitor__()
 #endif

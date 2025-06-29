@@ -90,7 +90,6 @@ extern "C" {
 #   define __IS_COMPILER_ARM_COMPILER__         1
 #endif
 
-
 #ifndef __PLOOC_VA_NUM_ARGS_IMPL
 #   define __PLOOC_VA_NUM_ARGS_IMPL( _0,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,     \
                                     _12,_13,_14,_15,_16,__N,...)      __N
@@ -100,6 +99,23 @@ extern "C" {
 #define __PLOOC_VA_NUM_ARGS(...)                                                \
             __PLOOC_VA_NUM_ARGS_IMPL( 0,##__VA_ARGS__,16,15,14,13,12,11,10,9,   \
                                       8,7,6,5,4,3,2,1,0)
+
+#undef __COMPILER_HAS_GNU_EXTENSIONS__
+#if __PLOOC_VA_NUM_ARGS() == 0
+#   define __COMPILER_HAS_GNU_EXTENSIONS__      1
+#endif
+
+#undef __IS_COMPILER_SUPPORT_C99__
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#   define __IS_COMPILER_SUPPORT_C99__          1
+#endif
+
+#undef __IS_COMPILER_SUPPORT_C11__
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ > 199901L
+#   define __IS_COMPILER_SUPPORT_C11__          1
+#endif
+
+
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
