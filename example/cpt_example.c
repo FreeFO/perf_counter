@@ -48,7 +48,7 @@ cpt_led_flash_cb_t * cpt_example_led_flash_init(cpt_led_flash_cb_t *ptThis)
     memset(ptThis, 0, sizeof(this));
     
     __ALIGNED(16)
-    static uint64_t s_dwStack[512];
+    static uint64_t s_dwStack[128];
     
     perfc_coroutine_init(&this.use_as__perfc_cpt_t.tCoroutine,
                          (perfc_coroutine_task_handler_t *)&cpt_example_led_flash,

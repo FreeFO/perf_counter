@@ -40,8 +40,12 @@ DEFAULT_ARGS=(-c "v")
 #
  PACK_BASE_FILES="
    LICENSE
+   perfc_common.h
    perf_counter.c
    perf_counter.h
+   perfc_task_coroutine.c
+   __perfc_task_common.h
+   perfc_task_pt.h
    perfc_port_default.c
    perfc_port_default.h
    perfc_port_pmu.c
