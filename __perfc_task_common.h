@@ -40,25 +40,9 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#ifndef __FSM_RT_TYPE__
-#   define __FSM_RT_TYPE__      1
-//! \name finit state machine state
-//! @{
-typedef enum {
-    fsm_rt_err          = -1,    //!< fsm error, error code can be get from other interface
-    fsm_rt_cpl          = 0,     //!< fsm complete
-    fsm_rt_on_going     = 1,     //!< fsm on-going
-    fsm_rt_wait_for_obj = 2,     //!< fsm wait for object
-    fsm_rt_asyn         = 3,     //!< fsm asynchronose complete, you can check it later.
-    fsm_rt_wait_for_res = 4,     //!< fsm wait for resource
-} fsm_rt_t;
-//! @}
-#endif
-
 typedef union perf_couroutine_rt_t {
     intptr_t *pValue;
     intptr_t  nResult;
-    fsm_rt_t  tState;
 } perf_couroutine_rt_t;
 
 typedef struct perfc_coroutine_t perfc_coroutine_t;
@@ -70,8 +54,6 @@ struct perfc_coroutine_t {
     //perfc_coroutine_task_handler_t *fnHandler;
     perf_couroutine_rt_t tReturn;
 };
-
-
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
