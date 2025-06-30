@@ -74,7 +74,7 @@ PERFC_CPT_BEGIN(this)
 
         printf("LED ON  [%lld][%p]\r\n", get_system_ms(), ptResource);
 
-    PERFC_CPT_DELAY_MS(200);
+    PERFC_CPT_DELAY_MS(500);
         
         printf("LED OFF [%lld][%p]\r\n", get_system_ms(), ptResource);
 

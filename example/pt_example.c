@@ -64,7 +64,7 @@ PERFC_PT_BEGIN(this.chState)
 
         printf("LED ON  [%lld]\r\n", get_system_ms());
 
-    PERFC_PT_DELAY_MS(200);
+    PERFC_PT_DELAY_MS(500);
         
         printf("LED OFF [%lld]\r\n", get_system_ms());
 
