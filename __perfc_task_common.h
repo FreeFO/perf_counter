@@ -42,12 +42,28 @@ extern "C" {
 
 typedef union perf_couroutine_rt_t {
     intptr_t *pValue;
+    /*
+     * NOTE:
+     *      when nResult < 0, it is an error code
+     *      when nResult <= 255, it is an status code
+     *          other postive value can be seen as a valid pointer
+     */
     intptr_t  nResult;
 } perf_couroutine_rt_t;
 
 typedef struct perfc_coroutine_t perfc_coroutine_t;
 typedef intptr_t perfc_coroutine_task_handler_t(perfc_coroutine_t *ptThis);
 
+/*
+ * Please use this perfc_coroutine_t as base class, it is recommended to use
+ * implement(perfc_coroutine_t) in your task class definition. E.g.
+ *
+ *  typedef struct {
+ *      implement(perfc_cpt_t);
+ *      void *ptResource;
+ *  } cpt_led_flash_cb_t;
+ * 
+ */
 struct perfc_coroutine_t {
     jmp_buf tYieldPoint;
     jmp_buf *ptCaller;
