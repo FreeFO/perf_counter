@@ -15,72 +15,41 @@
 *                                                                           *
 ****************************************************************************/
 
+#ifndef __CPT_EXAMPLE_H__
+#define __CPT_EXAMPLE_H__
+
 /*============================ INCLUDES ======================================*/
-#include "pt_example.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include "perf_counter.h"
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 /*============================ MACROS ========================================*/
-#undef this
-#define this    (*ptThis)
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+typedef struct {
+    implement(perfc_cpt_t);
+    void *ptResource;
+} cpt_led_flash_cb_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern
+cpt_led_flash_cb_t *cpt_example_led_flash_init(cpt_led_flash_cb_t *ptThis);
+
+extern
+fsm_rt_t cpt_example_led_flash(cpt_led_flash_cb_t *ptThis);
+
 /*============================ IMPLEMENTATION ================================*/
 
 
 
-pt_led_flash_cb_t * pt_example_led_flash_init(pt_led_flash_cb_t *ptThis)
-{
-    if (NULL == ptThis) {
-        return NULL;
-    }
-    
-    memset(ptThis, 0, sizeof(this));
-
-    return ptThis;
-}
-
-
-fsm_rt_t pt_example_led_flash(pt_led_flash_cb_t *ptThis)
-{
-
-PERFC_PT_BEGIN(this.chState)
-
-    do {
-    PERFC_PT_WAIT_RESOURCE_UNTIL( 
-        (this.ptResource != NULL),               /* quit condition */
-        this.ptResource = malloc(100);          /* try to allocate memory */
-    )
-
-        printf("LED ON  [%lld]\r\n", get_system_ms());
-
-    PERFC_PT_DELAY_MS(200);
-        
-        printf("LED OFF [%lld]\r\n", get_system_ms());
-
-
-    PERFC_PT_DELAY_MS(500);
-        
-        free(this.ptResource);
-    } while(1);
-
-PERFC_PT_END()
-
-    return fsm_rt_cpl;
-
-}
-
-
 #ifdef __cplusplus
 }
+#endif
+
 #endif

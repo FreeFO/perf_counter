@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include "pt_example.h"
+#include "cpt_example.h"
 
 #ifndef __PERF_CNT_USE_LONG_CLOCK__
 #include <time.h>
@@ -133,6 +134,10 @@ static
 PERFC_NOINIT
 pt_led_flash_cb_t s_tExamplePT;
 
+static 
+PERFC_NOINIT
+cpt_led_flash_cb_t s_tExampleCPT;
+
 int main (void)
 {
     int32_t iCycleResult = 0;
@@ -197,6 +202,7 @@ int main (void)
 #endif
 
     pt_example_led_flash_init(&s_tExamplePT);
+    cpt_example_led_flash_init(&s_tExampleCPT);
 
     while (1) {
         if (perfc_is_time_out_ms(10000)) {
@@ -217,6 +223,7 @@ int main (void)
 
         delay_us(20000);
         
-        pt_example_led_flash(&s_tExamplePT);
+        perfc_coroutine_call(&s_tExampleCPT.use_as__perfc_cpt_t.tCoroutine);
+        //pt_example_led_flash(&s_tExamplePT);
     }
 }

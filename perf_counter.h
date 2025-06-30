@@ -310,9 +310,6 @@ __asm(".global __ensure_systick_wrapper\n\t");
 #endif
 /*! @} */
 
-
-
-
 /*!
  * \addtogroup Deprecated
  * @{
@@ -599,7 +596,6 @@ SUCH DAMAGE.
 
 Author: Adam Dunkels
 */
-
 #define PERFC_PT_BEGIN(__state)                                                 \
             enum {                                                              \
                 count_offset = __COUNTER__ + 1,                                 \
@@ -671,10 +667,97 @@ Author: Adam Dunkels
             (*ptPTState) = 0;                                                   \
             return __VA_ARGS__;
 
+/* coroutine PT */
+#if __C_LANGUAGE_EXTENSIONS_PERFC_COROUTINE__
+
+typedef struct perfc_cpt_t {
+    perfc_coroutine_t tCoroutine;
+    uint8_t chState;
+}perfc_cpt_t;
+
+#define PERFC_CPT_BEGIN(__cpt)                                                  \
+            enum {                                                              \
+                count_offset = __COUNTER__ + 1,                                 \
+            };                                                                  \
+            perfc_cpt_t *ptTask = (perfc_cpt_t *)&(__cpt);                      \
+            bool bRunning = true;                                               \
+            while(bRunning) {                                                   \
+                switch (ptTask->chState) {                                      \
+                    case __COUNTER__ - count_offset: 
+
+#define PERFC_CPT_ENTRY(...)                                                    \
+                    (ptTask->chState) = (__COUNTER__ - count_offset + 1) >> 1;  \
+                    __VA_ARGS__                                                 \
+                case (__COUNTER__ - count_offset) >> 1: (void)(ptTask->chState);
+            
+#define PERFC_CPT_YIELD(...)                                                    \
+                    ptTask->tCoroutine.tReturn.nResult = __VA_ARGS__;           \
+                    perfc_coroutine_yield(&ptTask->tCoroutine);                 \
+
+#define PERFC_CPT_END()                                                         \
+                    (ptTask->chState) = 0;                                      \
+                    bRunning = false;                                           \
+                    break;                                                      \
+                }                                                               \
+            }
+
+#define PERFC_CPT_GOTO_PREV_ENTRY(...)                                          \
+                PERFC_CPT_YIELD(__VA_ARGS__);                                   \
+                break;
+
+#define PERFC_CPT_WAIT_UNTIL(__CONDITION, ...)                                  \
+            PERFC_CPT_ENTRY()                                                   \
+                __VA_ARGS__;                                                    \
+                if (!(__CONDITION)) {                                           \
+                    PERFC_CPT_GOTO_PREV_ENTRY(fsm_rt_on_going);                 \
+                }
+
+#define PERFC_CPT_WAIT_OBJ_UNTIL(__CONDITION, ...)                              \
+            PERFC_CPT_ENTRY()                                                   \
+                __VA_ARGS__;                                                    \
+                if (!(__CONDITION)) {                                           \
+                    PERFC_CPT_GOTO_PREV_ENTRY(fsm_rt_wait_for_obj);             \
+                }
+
+#define PERFC_CPT_WAIT_RESOURCE_UNTIL(__CONDITION, ...)                         \
+            PERFC_CPT_ENTRY()                                                   \
+                __VA_ARGS__;                                                    \
+                if (!(__CONDITION)) {                                           \
+                    PERFC_CPT_GOTO_PREV_ENTRY(fsm_rt_wait_for_res);             \
+                }
+
+#define PERFC_CPT_DELAY_MS(__ms, ...)                                           \
+            PERFC_CPT_ENTRY(                                                    \
+                static int64_t PERFC_SAFE_NAME(s_lTimestamp);                   \
+                UNUSED_PARAM(PERFC_SAFE_NAME(s_lTimestamp));                    \
+                int64_t *PERFC_SAFE_NAME(plTimestamp)                           \
+                    = (&PERFC_SAFE_NAME(s_lTimestamp), ##__VA_ARGS__);          \
+                *PERFC_SAFE_NAME(plTimestamp) = get_system_ms();                \
+            )                                                                   \
+            do {                                                                \
+                PERFC_SAFE_NAME(plTimestamp)                                    \
+                    = (&PERFC_SAFE_NAME(s_lTimestamp), ##__VA_ARGS__);          \
+                int64_t PERFC_SAFE_NAME(lElapsedMs) =                           \
+                    get_system_ms() - *PERFC_SAFE_NAME(plTimestamp);            \
+                if (PERFC_SAFE_NAME(lElapsedMs) < (__ms)) {                     \
+                    PERFC_CPT_GOTO_PREV_ENTRY(fsm_rt_on_going);                 \
+                }                                                               \
+            } while(0)
+
+
+#define PERFC_CPT_REPORT_STATUS(...)   PERFC_CPT_YIELD(__VA_ARGS__)
+            
+#define PERFC_CPT_RETURN(...)                                                   \
+            (ptTask->chState) = 0;                                              \
+            ptTask->tCoroutine.tReturn.nResult = __VA_ARGS__;                   \
+            bRunning = false;                                                   \
+            break;
+#endif
+
 /*============================ TYPES =========================================*/
 
 #ifndef __FSM_RT_TYPE__
-#   define __FSM_RT_TYPE__
+#   define __FSM_RT_TYPE__      1
 //! \name finit state machine state
 //! @{
 typedef enum {

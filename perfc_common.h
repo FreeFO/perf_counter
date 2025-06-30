@@ -119,6 +119,83 @@ extern "C" {
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+/*----------------------------------------------------------------------------*
+ * OOC and Private Protection                                                 *
+ *----------------------------------------------------------------------------*/
+/*  minimal support for OOPC */
+#undef __implement_ex
+#undef __implement
+#undef implement
+#undef implement_ex
+#undef inherit
+#undef inherit_ex
+
+/*!
+ * \note do NOT use this macro directly
+ */
+#ifdef   __cplusplus
+#   define __implement_ex(__type, __name)   __type  __name
+#else
+#   define __implement_ex(__type, __name)                                       \
+            union {                                                             \
+                __type  __name;                                                 \
+                __type;                                                         \
+            }
+#endif
+/*!
+ * \note do NOT use this macro
+ */
+#define __inherit_ex(__type, __name)   __type  __name
+
+
+/*!
+ * \note do NOT use this macro directly
+ */
+#define __implement(__type)             __implement_ex( __type,                 \
+                                                        use_as__##__type)
+
+
+/*!
+ * \note do NOT use this macro directly
+ */
+#define __inherit(__type)               __inherit_ex(__type,use_as__##__type)
+
+
+/*!
+ * \brief inherit a given class
+ * \param __type the base class, you can use .use_as_xxxxx for referencing 
+ *               the base.
+ * \note this macro supports microsoft extensions (-fms-extensions)
+ */
+#define implement(__type)               __implement(__type)
+
+/*!
+ * \brief inherit a given class and give it an alias name
+ * \param __type the base class
+ * \param __name an alias name for referencing the base class
+ * \note this macro supports microsoft extensions (-fms-extensions)
+ */
+#define implement_ex(__type, __name)    __implement_ex(__type, __name)
+
+
+/*!
+ * \brief inherit a given class
+ * \param __type the base class, you can use .use_as_xxxxx for referencing 
+ *               the base.
+ * \note this macro does NOT support microsoft extensions (-fms-extensions)
+ */
+#define inherit(__type)                 __inherit(__type)
+
+/*!
+ * \brief inherit a given class and give it an alias name
+ * \param __type the base class
+ * \param __name an alias name for referencing the base class
+ * \note this macro does NOT support microsoft extensions (-fms-extensions)
+ */
+#define inherit_ex(__type, __name)      __inherit_ex(__type, __name)
+
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

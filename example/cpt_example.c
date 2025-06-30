@@ -16,7 +16,7 @@
 ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-#include "pt_example.h"
+#include "cpt_example.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -39,42 +39,52 @@ extern "C" {
 
 
 
-pt_led_flash_cb_t * pt_example_led_flash_init(pt_led_flash_cb_t *ptThis)
+cpt_led_flash_cb_t * cpt_example_led_flash_init(cpt_led_flash_cb_t *ptThis)
 {
     if (NULL == ptThis) {
         return NULL;
     }
     
     memset(ptThis, 0, sizeof(this));
+    
+    __ALIGNED(16)
+    static uint64_t s_dwStack[512];
+    
+    perfc_coroutine_init(&this.use_as__perfc_cpt_t.tCoroutine,
+                         (perfc_coroutine_task_handler_t *)&cpt_example_led_flash,
+                         s_dwStack,
+                         sizeof(s_dwStack));
 
     return ptThis;
 }
 
 
-fsm_rt_t pt_example_led_flash(pt_led_flash_cb_t *ptThis)
+fsm_rt_t cpt_example_led_flash(cpt_led_flash_cb_t *ptThis)
 {
 
-PERFC_PT_BEGIN(this.chState)
+PERFC_CPT_BEGIN(this)
 
     do {
-    PERFC_PT_WAIT_RESOURCE_UNTIL( 
-        (this.ptResource != NULL),               /* quit condition */
-        this.ptResource = malloc(100);          /* try to allocate memory */
+        void *ptResource = NULL;
+    
+    PERFC_CPT_WAIT_RESOURCE_UNTIL( 
+        (ptResource != NULL),               /* quit condition */
+        ptResource = malloc(100);          /* try to allocate memory */
     )
 
-        printf("LED ON  [%lld]\r\n", get_system_ms());
+        printf("LED ON  [%lld][%p]\r\n", get_system_ms(), ptResource);
 
-    PERFC_PT_DELAY_MS(200);
+    PERFC_CPT_DELAY_MS(200);
         
-        printf("LED OFF [%lld]\r\n", get_system_ms());
+        printf("LED OFF [%lld][%p]\r\n", get_system_ms(), ptResource);
 
 
-    PERFC_PT_DELAY_MS(500);
+    PERFC_CPT_DELAY_MS(500);
         
-        free(this.ptResource);
+        free(ptResource);
     } while(1);
 
-PERFC_PT_END()
+PERFC_CPT_END()
 
     return fsm_rt_cpl;
 

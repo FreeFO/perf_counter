@@ -483,15 +483,16 @@ extern void __rt_thread_scheduler_hook(struct rt_thread *from, struct rt_thread 
               </Pre_Include_Global_h>
             </component>
 
-    <!--
-        <component Cclass="Language Extension" Cgroup="Coroutine" Cversion="0.5.0">
+        <component Cclass="Language Extension" Cgroup="Coroutine" Cversion="0.5.0" condition="perf_counter">
           <description>A C software infrastructure for coroutines.</description>
           <files>
-            <file category="header"     name="__perfc_task_common.h"/>
+            <file category="preIncludeGlobal"   name="__perfc_task_common.h"/>
+            <file category="sourceC"            name="perfc_task_coroutine.c"/>
           </files>
+          <Pre_Include_Global_h>
+#define __C_LANGUAGE_EXTENSIONS_PERFC_COROUTINE__  1
+          </Pre_Include_Global_h>
         </component>
-     -->
-
 
     </components>
   
