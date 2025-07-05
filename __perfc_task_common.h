@@ -65,7 +65,7 @@ typedef intptr_t perfc_coroutine_task_handler_t(perfc_coroutine_t *ptThis);
  * 
  */
 struct perfc_coroutine_t {
-    jmp_buf tYieldPoint;
+    jmp_buf *ptYieldPoint;
     jmp_buf *ptCaller;
     perf_couroutine_rt_t tReturn;
 };

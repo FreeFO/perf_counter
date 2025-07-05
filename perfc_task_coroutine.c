@@ -61,19 +61,32 @@ int perfc_coroutine_init(   perfc_coroutine_t *ptTask,
                             size_t tSizeInByte)
 {
     do {
-        if (NULL == ptTask || NULL == fnHandler || NULL == pStackBase || tSizeInByte < 128) {
+        size_t nJmpbufSize = (sizeof(jmp_buf) + 7) & (~((uintptr_t)0x07));
+        if (    (NULL == ptTask)
+            ||  (NULL == fnHandler)
+            ||  (NULL == pStackBase)
+            ||  (tSizeInByte < (nJmpbufSize + 17 * sizeof(uint64_t)))) {
             break;
         }
-        uintptr_t pStackTop = (uintptr_t)pStackBase + tSizeInByte - 8;
-        
         memset(ptTask, 0, sizeof(*ptTask));
-        //ptTask->fnHandler = fnHandler;
+        
+        uintptr_t pStackTop = (uintptr_t)pStackBase + tSizeInByte;
+        /* force 8bytes alignment */
+        pStackTop &= (~((uintptr_t)0x07));
+        // add Yieldpoint
+        pStackTop -= nJmpbufSize;
+        ptTask->ptYieldPoint = (jmp_buf *)pStackTop;
+
+        // add canary
+        do {
+            pStackBase = (void *)(((uintptr_t)pStackBase + 7) & (~((uintptr_t)0x07)));
+            *((volatile uint64_t *)pStackBase) = 0xDEADBEEFCAFE55AAul;
+        } while(0);
 
         typedef volatile struct {
             perfc_coroutine_t *ptTask;
             perfc_coroutine_task_handler_t *fnHandler;
             uintptr_t pnTaskStack;
-            jmp_buf tReturnPoint;
         } __local_t;
         
         static __local_t s_tWhiteBoard;
@@ -82,17 +95,19 @@ int perfc_coroutine_init(   perfc_coroutine_t *ptTask,
         #define local   (*s_ptLocal)
         
         __IRQ_SAFE {
-            local.pnTaskStack = ((uintptr_t)pStackTop) & (~((uintptr_t)0x07));
+            local.pnTaskStack = pStackTop;
             local.fnHandler = fnHandler;
             local.ptTask = ptTask;
+            jmp_buf tReturnPoint;
 
-            if (setjmp(*(jmp_buf *)&(local.tReturnPoint)) == 0) {
-                ptTask->ptCaller = (jmp_buf *)&(local.tReturnPoint);
+            if (setjmp(*(jmp_buf *)&tReturnPoint) == 0) {
+
+                ptTask->ptCaller = &tReturnPoint;
                 __perfc_user_porting_set_sp(local.pnTaskStack);
                 
                 do {
                     /* set the initial yield point */
-                    if (0 == setjmp(local.ptTask->tYieldPoint)) {
+                    if (0 == setjmp(*(jmp_buf *)(local.ptTask->ptYieldPoint))) {
                         /* the setup phase, return to exit point */
                         longjmp(*(jmp_buf *)(local.ptTask->ptCaller), 1);
                     }
@@ -100,29 +115,12 @@ int perfc_coroutine_init(   perfc_coroutine_t *ptTask,
                 } while(1);
             }
         }
-        __NOP();
+
         return 0;
     } while(0);
 
     return -1;
 }
-
-#if 0
-int perfc_coroutine_set_entry(perfc_coroutine_t *ptTask)
-{
-    assert(NULL != ptTask);
-    return setjmp(ptTask->tYieldPoint);
-}
-
-void perfc_coroutine_exit_to_caller(perfc_coroutine_t *ptTask)
-{
-    assert(NULL != ptTask);
-    assert(NULL != ptTask->ptCaller);
-    longjmp(*(ptTask->ptCaller), 1);
-    assert(false);
-    while(1) __NOP();
-}
-#endif
 
 perf_couroutine_rt_t perfc_coroutine_call(perfc_coroutine_t *ptTask)
 {
@@ -130,12 +128,12 @@ perf_couroutine_rt_t perfc_coroutine_call(perfc_coroutine_t *ptTask)
         return (perf_couroutine_rt_t)-1;
     }
 
-    static jmp_buf tReturnPoint;
+    jmp_buf tReturnPoint;
     if (0 == setjmp(tReturnPoint)) {
         ptTask->ptCaller = &tReturnPoint;
 
         /* go to the yield point */
-        longjmp(ptTask->tYieldPoint, 1);
+        longjmp(*(ptTask->ptYieldPoint), 1);
         
         assert(false);
         while(1) __NOP();   /* we should not reach here */
@@ -147,7 +145,7 @@ perf_couroutine_rt_t perfc_coroutine_call(perfc_coroutine_t *ptTask)
 void perfc_coroutine_yield(perfc_coroutine_t *ptTask)
 {
     assert(NULL != ptTask);
-    if (0 == setjmp(ptTask->tYieldPoint)) {
+    if (0 == setjmp(*(ptTask->ptYieldPoint))) {
         /* yeild */
         assert(NULL != ptTask->ptCaller);
         longjmp(*(ptTask->ptCaller), 1);

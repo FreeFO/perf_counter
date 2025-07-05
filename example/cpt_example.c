@@ -21,6 +21,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#if defined(__clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunknown-warning-option"
+#   pragma clang diagnostic ignored "-Wreserved-identifier"
+#   pragma clang diagnostic ignored "-Wdeclaration-after-statement"
+#   pragma clang diagnostic ignored "-Wcast-function-type-mismatch"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -37,19 +45,17 @@ extern "C" {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-
-
 cpt_led_flash_cb_t * cpt_example_led_flash_init(cpt_led_flash_cb_t *ptThis)
 {
     if (NULL == ptThis) {
         return NULL;
     }
-    
+
     memset(ptThis, 0, sizeof(this));
-    
+
     __ALIGNED(16)
     static uint64_t s_dwStack[128];
-    
+
     perfc_coroutine_init(&this.use_as__perfc_cpt_t.tCoroutine,
                          (perfc_coroutine_task_handler_t *)&cpt_example_led_flash,
                          s_dwStack,

@@ -1858,7 +1858,7 @@
           <targetInfo name="example_arm_compiler_6"/>
         </targetInfos>
       </component>
-      <component Cclass="Language Extension" Cgroup="Coroutine" Cvendor="GorgonMeducer" Cversion="0.5.0" condition="perf_counter">
+      <component Cclass="Language Extension" Cgroup="Coroutine" Cvendor="GorgonMeducer" Cversion="1.0.0" condition="perf_counter">
         <package name="perf_counter" schemaVersion="1.7.37" url="https://raw.githubusercontent.com/GorgonMeducer/perf_counter/CMSIS-Pack/cmsis-pack/" vendor="GorgonMeducer" version="9.9.9"/>
         <targetInfos>
           <targetInfo name="example_arm compiler_5"/>
@@ -1874,7 +1874,7 @@
           <targetInfo name="library"/>
         </targetInfos>
       </component>
-      <component Cclass="Utilities" Cgroup="perf_counter" Csub="Core" Cvariant="Source" Cvendor="GorgonMeducer" Cversion="2.4.1" condition="CMSIS-CORE">
+      <component Cclass="Utilities" Cgroup="perf_counter" Csub="Core" Cvariant="Source" Cvendor="GorgonMeducer" Cversion="2.5.0" condition="CMSIS-CORE">
         <package name="perf_counter" schemaVersion="1.7.37" url="https://raw.githubusercontent.com/GorgonMeducer/perf_counter/CMSIS-Pack/cmsis-pack/" vendor="GorgonMeducer" version="9.9.9"/>
         <targetInfos>
           <targetInfo name="example_arm compiler_5"/>
