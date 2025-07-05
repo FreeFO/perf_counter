@@ -22,6 +22,11 @@
 /*============================ INCLUDES ======================================*/
 #include "perf_counter.h"
 
+#if defined(__clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunknown-warning-option"
+#   pragma clang diagnostic ignored "-Wunused-label"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -154,11 +159,10 @@ Author: Adam Dunkels
             enum {                                                              \
                 count_offset = __COUNTER__ + 1,                                 \
             };                                                                  \
+label_switch_start:                                                             \
             perfc_cpt_t *ptTask = (perfc_cpt_t *)&(__cpt);                      \
-            bool bRunning = true;                                               \
-            while(bRunning) {                                                   \
-                switch (ptTask->chState) {                                      \
-                    case __COUNTER__ - count_offset: 
+            switch (ptTask->chState) {                                          \
+                case __COUNTER__ - count_offset: 
 
 #define PERFC_CPT_ENTRY(...)                                                    \
                     (ptTask->chState) = (__COUNTER__ - count_offset + 1) >> 1;  \
@@ -171,52 +175,49 @@ Author: Adam Dunkels
 
 #define PERFC_CPT_END()                                                         \
                     (ptTask->chState) = 0;                                      \
-                    bRunning = false;                                           \
                     break;                                                      \
-                }                                                               \
-            }
+            }                                                                   \
 
 #define PERFC_CPT_GOTO_PREV_ENTRY(...)                                          \
                 PERFC_CPT_YIELD(__VA_ARGS__);                                   \
-                break;
+                goto label_switch_start;
 
 #define PERFC_CPT_WAIT_UNTIL(__CONDITION, ...)                                  \
-            PERFC_CPT_ENTRY()                                                   \
+            do {                                                                \
                 __VA_ARGS__;                                                    \
-                if (!(__CONDITION)) {                                           \
-                    PERFC_CPT_GOTO_PREV_ENTRY(fsm_rt_on_going);                 \
-                }
+                if ((__CONDITION)) {                                            \
+                    break;                                                      \
+                }                                                               \
+                perfc_coroutine_yield(&ptTask->tCoroutine);                     \
+            } while(1);
 
 #define PERFC_CPT_WAIT_OBJ_UNTIL(__CONDITION, ...)                              \
-            PERFC_CPT_ENTRY()                                                   \
+            do {                                                                \
                 __VA_ARGS__;                                                    \
-                if (!(__CONDITION)) {                                           \
-                    PERFC_CPT_GOTO_PREV_ENTRY(fsm_rt_wait_for_obj);             \
-                }
+                if ((__CONDITION)) {                                            \
+                    break;                                                      \
+                }                                                               \
+                PERFC_CPT_YIELD(fsm_rt_wait_for_obj);                           \
+            } while(1);
 
 #define PERFC_CPT_WAIT_RESOURCE_UNTIL(__CONDITION, ...)                         \
-            PERFC_CPT_ENTRY()                                                   \
+            do {                                                                \
                 __VA_ARGS__;                                                    \
-                if (!(__CONDITION)) {                                           \
-                    PERFC_CPT_GOTO_PREV_ENTRY(fsm_rt_wait_for_res);             \
-                }
+                if ((__CONDITION)) {                                            \
+                    break;                                                      \
+                }                                                               \
+                PERFC_CPT_YIELD(fsm_rt_wait_for_res);                           \
+            } while(1);
 
 #define PERFC_CPT_DELAY_MS(__ms, ...)                                           \
-            PERFC_CPT_ENTRY(                                                    \
-                static int64_t PERFC_SAFE_NAME(s_lTimestamp);                   \
-                UNUSED_PARAM(PERFC_SAFE_NAME(s_lTimestamp));                    \
-                int64_t *PERFC_SAFE_NAME(plTimestamp)                           \
-                    = (&PERFC_SAFE_NAME(s_lTimestamp), ##__VA_ARGS__);          \
-                *PERFC_SAFE_NAME(plTimestamp) = get_system_ms();                \
-            )                                                                   \
             do {                                                                \
-                PERFC_SAFE_NAME(plTimestamp)                                    \
-                    = (&PERFC_SAFE_NAME(s_lTimestamp), ##__VA_ARGS__);          \
-                int64_t PERFC_SAFE_NAME(lElapsedMs) =                           \
-                    get_system_ms() - *PERFC_SAFE_NAME(plTimestamp);            \
-                if (PERFC_SAFE_NAME(lElapsedMs) < (__ms)) {                     \
-                    PERFC_CPT_GOTO_PREV_ENTRY(fsm_rt_on_going);                 \
-                }                                                               \
+                int64_t lDelayTimestampInMs = get_system_ms();                  \
+                do {                                                            \
+                    if ((get_system_ms() - lDelayTimestampInMs) >= (__ms)) {    \
+                        break;                                                  \
+                    }                                                           \
+                    perfc_coroutine_yield(&ptTask->tCoroutine);                 \
+                } while(1);                                                     \
             } while(0)
 
 
@@ -224,9 +225,8 @@ Author: Adam Dunkels
             
 #define PERFC_CPT_RETURN(...)                                                   \
             (ptTask->chState) = 0;                                              \
-            ptTask->tCoroutine.tReturn.nResult = __VA_ARGS__;                   \
-            bRunning = false;                                                   \
-            break;
+            return __VA_ARGS__;
+
 #endif
 
 /*============================ TYPES =========================================*/
