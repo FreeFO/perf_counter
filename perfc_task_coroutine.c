@@ -38,21 +38,17 @@ extern "C" {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+extern
+__attribute__((noinline))
+uintptr_t __perfc_port_get_sp(void);
+
+extern
+__attribute__((noinline))
+void __perfc_port_set_sp(uintptr_t nSP);
+
 /*============================ IMPLEMENTATION ================================*/
 
-__WEAK
-__attribute__((noinline))
-uintptr_t __perfc_user_porting_get_sp(void)
-{
-    return __get_MSP();
-}
 
-__WEAK
-__attribute__((noinline))
-void __perfc_user_porting_set_sp(uintptr_t nSP)
-{
-    return __set_MSP(nSP);
-}
 
 __attribute__((noinline))
 int perfc_coroutine_init(   perfc_coroutine_t *ptTask, 
@@ -103,7 +99,7 @@ int perfc_coroutine_init(   perfc_coroutine_t *ptTask,
             if (setjmp(*(jmp_buf *)&tReturnPoint) == 0) {
 
                 ptTask->ptCaller = &tReturnPoint;
-                __perfc_user_porting_set_sp(local.pnTaskStack);
+                __perfc_port_set_sp(local.pnTaskStack);
                 
                 do {
                     /* set the initial yield point */
@@ -155,9 +151,6 @@ void perfc_coroutine_yield(perfc_coroutine_t *ptTask)
     
     /* return from yield */
 }
-
-
-
 
 
 /*! @} */
