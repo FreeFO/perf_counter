@@ -37,8 +37,6 @@ extern "C" {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-
-
 pt_led_flash_cb_t * pt_example_led_flash_init(pt_led_flash_cb_t *ptThis)
 {
     if (NULL == ptThis) {

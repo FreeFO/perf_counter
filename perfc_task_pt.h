@@ -159,8 +159,8 @@ Author: Adam Dunkels
             enum {                                                              \
                 count_offset = __COUNTER__ + 1,                                 \
             };                                                                  \
-label_switch_start:                                                             \
             perfc_cpt_t *ptTask = (perfc_cpt_t *)&(__cpt);                      \
+label_switch_start:                                                             \
             switch (ptTask->chState) {                                          \
                 case __COUNTER__ - count_offset: 
 
@@ -170,8 +170,10 @@ label_switch_start:                                                             
                 case (__COUNTER__ - count_offset) >> 1: (void)(ptTask->chState);
             
 #define PERFC_CPT_YIELD(...)                                                    \
+                do {                                                            \
                     ptTask->tCoroutine.tReturn.nResult = __VA_ARGS__;           \
                     perfc_coroutine_yield(&ptTask->tCoroutine);                 \
+                } while(0)
 
 #define PERFC_CPT_END()                                                         \
                     (ptTask->chState) = 0;                                      \
@@ -179,8 +181,10 @@ label_switch_start:                                                             
             }                                                                   \
 
 #define PERFC_CPT_GOTO_PREV_ENTRY(...)                                          \
-                PERFC_CPT_YIELD(__VA_ARGS__);                                   \
-                goto label_switch_start;
+                do {                                                            \
+                    PERFC_CPT_YIELD((fsm_rt_on_going,##__VA_ARGS__));           \
+                    goto label_switch_start;                                    \
+                } while(0)
 
 #define PERFC_CPT_WAIT_UNTIL(__CONDITION, ...)                                  \
             do {                                                                \
@@ -188,7 +192,7 @@ label_switch_start:                                                             
                 if ((__CONDITION)) {                                            \
                     break;                                                      \
                 }                                                               \
-                perfc_coroutine_yield(&ptTask->tCoroutine);                     \
+                PERFC_CPT_YIELD(fsm_rt_on_going);                               \
             } while(1);
 
 #define PERFC_CPT_WAIT_OBJ_UNTIL(__CONDITION, ...)                              \
@@ -216,7 +220,7 @@ label_switch_start:                                                             
                     if ((get_system_ms() - lDelayTimestampInMs) >= (__ms)) {    \
                         break;                                                  \
                     }                                                           \
-                    perfc_coroutine_yield(&ptTask->tCoroutine);                 \
+                    PERFC_CPT_YIELD(fsm_rt_on_going);                               \
                 } while(1);                                                     \
             } while(0)
 
@@ -224,8 +228,10 @@ label_switch_start:                                                             
 #define PERFC_CPT_REPORT_STATUS(...)   PERFC_CPT_YIELD(__VA_ARGS__)
             
 #define PERFC_CPT_RETURN(...)                                                   \
-            (ptTask->chState) = 0;                                              \
-            return __VA_ARGS__;
+            do {                                                                \
+                (ptTask->chState) = 0;                                          \
+                return __VA_ARGS__;                                             \
+            } while(0)
 
 #endif
 

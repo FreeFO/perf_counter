@@ -329,7 +329,7 @@
             <uC99>1</uC99>
             <uGnu>1</uGnu>
             <useXO>0</useXO>
-            <v6Lang>6</v6Lang>
+            <v6Lang>4</v6Lang>
             <v6LangP>3</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
@@ -337,7 +337,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-fms-extensions -Wno-microsoft-anon-tag -Wno-missing-prototypes -Wno-reserved-identifier -Wno-sign-conversion -Wno-c11-extensions -Wno-implicit-int-conversion -Wno-invalid-utf8 -Wno-unsafe-buffer-usage</MiscControls>
+              <MiscControls></MiscControls>
               <Define>__PERF_COUNTER_CFG_USE_SYSTICK_WRAPPER__</Define>
               <Undefine></Undefine>
               <IncludePath>..</IncludePath>

@@ -44,6 +44,8 @@ extern "C" {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
+__attribute__((section(".bss.stacks.coroutine")))
+uint64_t s_dwStack[128];
 
 cpt_led_flash_cb_t * cpt_example_led_flash_init(cpt_led_flash_cb_t *ptThis)
 {
@@ -53,14 +55,26 @@ cpt_led_flash_cb_t * cpt_example_led_flash_init(cpt_led_flash_cb_t *ptThis)
 
     memset(ptThis, 0, sizeof(this));
 
-    static uint64_t s_dwStack[128];
-
     perfc_coroutine_init(&this.use_as__perfc_cpt_t.tCoroutine,
                          (perfc_coroutine_task_handler_t *)&cpt_example_led_flash,
                          s_dwStack,
                          sizeof(s_dwStack));
 
     return ptThis;
+}
+
+void perf_coroutine_report_error(   perfc_coroutine_t *ptTask, 
+                                    perfc_coroutine_err_t tError)
+{
+    UNUSED_PARAM(ptTask);
+    UNUSED_PARAM(tError);
+    
+    if (tError == PERFC_CR_ERR_STACK_OVERFLOW) {
+        printf("Stack Overflow\r\n");
+
+    }
+    
+    assert(tError == PERFC_CR_ERR_NONE);
 }
 
 
@@ -83,10 +97,11 @@ PERFC_CPT_BEGIN(this)
         
         printf("LED OFF [%lld][%p]\r\n", get_system_ms(), ptResource);
 
-
     PERFC_CPT_DELAY_MS(500);
         
         free(ptResource);
+        
+        PERFC_CPT_REPORT_STATUS(fsm_rt_cpl);
     } while(1);
 
 PERFC_CPT_END()

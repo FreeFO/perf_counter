@@ -40,7 +40,12 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef union perf_couroutine_rt_t {
+typedef enum {
+    PERFC_CR_ERR_STACK_OVERFLOW = -1,
+    PERFC_CR_ERR_NONE,
+} perfc_coroutine_err_t;
+
+typedef union perfc_coroutine_rt_t {
     intptr_t *pValue;
     /*
      * NOTE:
@@ -49,7 +54,7 @@ typedef union perf_couroutine_rt_t {
      *          other postive value can be seen as a valid pointer
      */
     intptr_t  nResult;
-} perf_couroutine_rt_t;
+} perfc_coroutine_rt_t;
 
 typedef struct perfc_coroutine_t perfc_coroutine_t;
 typedef intptr_t perfc_coroutine_task_handler_t(perfc_coroutine_t *ptThis);
@@ -67,7 +72,8 @@ typedef intptr_t perfc_coroutine_task_handler_t(perfc_coroutine_t *ptThis);
 struct perfc_coroutine_t {
     jmp_buf *ptYieldPoint;
     jmp_buf *ptCaller;
-    perf_couroutine_rt_t tReturn;
+    void *pStackBase;
+    perfc_coroutine_rt_t tReturn;
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -82,10 +88,13 @@ int perfc_coroutine_init(   perfc_coroutine_t *ptTask,
                             size_t tSizeInByte);
 
 extern
-perf_couroutine_rt_t perfc_coroutine_call(perfc_coroutine_t *ptTask);
+perfc_coroutine_rt_t perfc_coroutine_call(perfc_coroutine_t *ptTask);
 
 extern
 void perfc_coroutine_yield(perfc_coroutine_t *ptTask);
+
+extern
+size_t perfc_coroutine_stack_remain(perfc_coroutine_t *ptTask);
 
 
 /*============================ IMPLEMENTATION ================================*/

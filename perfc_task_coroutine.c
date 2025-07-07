@@ -48,8 +48,6 @@ void __perfc_port_set_sp(uintptr_t nSP);
 
 /*============================ IMPLEMENTATION ================================*/
 
-
-
 __attribute__((noinline))
 int perfc_coroutine_init(   perfc_coroutine_t *ptTask, 
                             perfc_coroutine_task_handler_t *fnHandler,
@@ -66,6 +64,8 @@ int perfc_coroutine_init(   perfc_coroutine_t *ptTask,
         }
         memset(ptTask, 0, sizeof(*ptTask));
         
+        ptTask->pStackBase = pStackBase;
+        
         uintptr_t pStackTop = (uintptr_t)pStackBase + tSizeInByte;
         /* force 8bytes alignment */
         pStackTop &= (~((uintptr_t)0x07));
@@ -73,10 +73,14 @@ int perfc_coroutine_init(   perfc_coroutine_t *ptTask,
         pStackTop -= nJmpbufSize;
         ptTask->ptYieldPoint = (jmp_buf *)pStackTop;
 
-        // add canary
+        // fill the stack with watermark
         do {
             pStackBase = (void *)(((uintptr_t)pStackBase + 7) & (~((uintptr_t)0x07)));
-            *((volatile uint64_t *)pStackBase) = 0xDEADBEEFCAFE55AAul;
+            
+            uint32_t * pwStackPointer = (uint32_t *) pStackBase;
+            while((uintptr_t)pwStackPointer < pStackTop) {
+                *pwStackPointer++ = 0xDEADBEEF;
+            }
         } while(0);
 
         typedef volatile struct {
@@ -118,10 +122,40 @@ int perfc_coroutine_init(   perfc_coroutine_t *ptTask,
     return -1;
 }
 
-perf_couroutine_rt_t perfc_coroutine_call(perfc_coroutine_t *ptTask)
+__WEAK
+__attribute__((noinline))
+void perf_coroutine_report_error(   perfc_coroutine_t *ptTask, 
+                                    perfc_coroutine_err_t tError)
+{
+    UNUSED_PARAM(ptTask);
+    UNUSED_PARAM(tError);
+    assert(tError == PERFC_CR_ERR_NONE);
+    while(1) __NOP();
+}
+
+size_t perfc_coroutine_stack_remain(perfc_coroutine_t *ptTask)
 {
     if (NULL == ptTask) {
-        return (perf_couroutine_rt_t)-1;
+        return 0;
+    }
+
+    size_t nDWordCount = 0;
+
+    uint64_t *pdwCanary = (uint64_t *)
+            (   ((uintptr_t)(ptTask->pStackBase) + 7)
+            &   (~((uintptr_t)0x07)));
+    
+    while(*pdwCanary++ == 0xDEADBEEFDEADBEEFul) {
+        nDWordCount++;
+    }
+
+    return nDWordCount * sizeof(uint64_t);
+}
+
+perfc_coroutine_rt_t perfc_coroutine_call(perfc_coroutine_t *ptTask)
+{
+    if (NULL == ptTask) {
+        return (perfc_coroutine_rt_t)-1;
     }
 
     jmp_buf tReturnPoint;
@@ -134,7 +168,18 @@ perf_couroutine_rt_t perfc_coroutine_call(perfc_coroutine_t *ptTask)
         assert(false);
         while(1) __NOP();   /* we should not reach here */
     }
-    
+
+    /* perform stack overflow detection */
+    do {
+        uint64_t *pdwCanary = (uint64_t *)
+            (   ((uintptr_t)(ptTask->pStackBase) + 7)
+            &   (~((uintptr_t)0x07)));
+        if (*pdwCanary != 0xDEADBEEFDEADBEEFul) {
+            /* report stackover flow */
+            perf_coroutine_report_error(ptTask, PERFC_CR_ERR_STACK_OVERFLOW);
+        }
+    } while(0);
+
     return ptTask->tReturn;
 }
 
@@ -148,7 +193,6 @@ void perfc_coroutine_yield(perfc_coroutine_t *ptTask)
         assert(false);
         while(1) __NOP();   /* we should not reach here */
     }
-    
     /* return from yield */
 }
 

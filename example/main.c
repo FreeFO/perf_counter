@@ -222,8 +222,14 @@ int main (void)
         }
 
         delay_us(20000);
-        
-        perfc_coroutine_call(&s_tExampleCPT.use_as__perfc_cpt_t.tCoroutine);
+
+        fsm_rt_t tResult = perfc_coroutine_call((perfc_coroutine_t *)&s_tExampleCPT).nResult;
+        if (fsm_rt_cpl == tResult) {
+            size_t tStackRemain 
+                = perfc_coroutine_stack_remain((perfc_coroutine_t *)&s_tExampleCPT);
+            printf("\r\nCoroutine Stack Remain: %d\r\n", tStackRemain);
+        }
+
         //pt_example_led_flash(&s_tExamplePT);
     }
 }
