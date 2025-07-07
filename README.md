@@ -1,5 +1,9 @@
 # perf_counter (v2.5.0-dev)
-A dedicated performance counter for Cortex-M Systick. It shares the SysTick with users' original SysTick function(s) without interfering with it. This library will bring new functionalities, such as performance counter,` delay_us` and `clock()` service defined in `time.h`.
+A dedicated performance counter mainly for micro-controllers. 
+
+For Cortex-M processors, the Systick will be used by default. The `perf_counter` shares the SysTick with users' original SysTick function(s) without interfering with it. This library will bring new functionalities, such as performance counter,` perfc_delay_us`, `perfc_delay_ms` and `clock()` service defined in `time.h`.
+
+A dedicated template is provided to port the perf_counter to different architectures or using a different Timer instead of SysTick in Cortex-M processors.
 
 ### Features:
 
@@ -182,7 +186,9 @@ void main(void)
 }
 ```
 
-NOTE: The `__usage__` stores the percentage information.
+> [!NOTE]
+>
+> The `__usage__` stores the percentage information.
 
 
 
@@ -247,7 +253,9 @@ The result might look like the following:
 
 You can get the system timestamp (since the initialization of perf_counter service) via the functions `get_system_ticks()` and `get_system_ms()`. 
 
-**NOTE**: The `get_system_ms()` is **NOT** a wrapper of the function `get_system_ticks()`. 
+> [!NOTE]
+>
+>  The `get_system_ms()` is **NOT** a wrapper of the function `get_system_ticks()`. 
 
 
 
@@ -351,7 +359,9 @@ Invalid Time Stamp Source selected in EventRecorderConf.h!
 
 Please set the macro `EVENT_TIMESTAMP_SOURCE` to `3` to suppress it.
 
-**IMPORTANT**: Please always make sure the macro `EVENT_TIMESTAMP_FREQ` is `0`
+> [!IMPORTANT]
+>
+> Please always make sure the macro `EVENT_TIMESTAMP_FREQ` is `0`
 
 
 
