@@ -398,7 +398,11 @@ git clone https://github.com/GorgonMeducer/perf_counter.git
 2. Add including path for `perf_counter` folder
 3. Add `perf_counter.c` and `perfc_port_default.c` to your project for compilation. 
 
-> **NOTE**: Please do **NOT** add any assembly source files of this `perf_counter` library to your compilation, i.e. `systick_wrapper_gcc.S`, `systick_wrapper_gnu.s` or `systick_wrapper_ual.s`.
+> [!IMPORTANT]
+>
+> Please do **NOT** add any assembly source files of this `perf_counter` library to your compilation, i.e. `systick_wrapper_gcc.S`, `systick_wrapper_gnu.s` or `systick_wrapper_ual.s`.
+
+
 
 4. Include `perf_counter.h` in the corresponding c source file:
 
@@ -421,8 +425,15 @@ void SysTick_Handler(void)
 
 
 7. Ensure the `SystemCoreClock` is updated with the same value as CPU frequency. 
-8. **IMPORTANT**: Make sure the `SysTick_CTRL_CLKSOURCE_Msk` bit ( bit 2) of `SysTick->CTRL` register is `1` that means SysTick runs with the same clock source as the target Cortex-M processor. 
-9. Initialize the perf_counter with a boolean value that indicates whether the user applications and/or RTOS have already occupied the SysTick.
+
+> [!IMPORTANT]
+>
+> Make sure the `SysTick_CTRL_CLKSOURCE_Msk` bit ( bit 2) of `SysTick->CTRL` register is `1` that means SysTick runs with the same clock source as the target Cortex-M processor. 
+
+
+
+
+8. Initialize the perf_counter with a boolean value that indicates whether the user applications and/or RTOS have already occupied the SysTick.
 
 ```c
 void main(void)
@@ -451,17 +462,19 @@ void main(void)
 }
 ```
 
-10. **IMPORTANT**: Please enable the GNU extension in your compiler. For **GCC** and **CLANG**, it is `--std=gnu99` or `--std=gnu11`, and for other compilers, please check the user manual first. Fail to do so, you will not only trigger the warning in `perf_counter.h`, but also lose the function correctness of `__cycleof__()` and `__super_loop_monitor__()`, because `__PLOOC_VA_NUM_ARGS()` doesn't report `0` when passed with no argument. 
+> [!IMPORTANT]
+>
+> Please enable the GNU extension in your compiler. For **GCC** and **CLANG**, it is `--std=gnu99` or `--std=gnu11`, and for other compilers, please check the user manual first. Fail to do so, you will not only trigger the warning in `perf_counter.h`, but also lose the function correctness of `__cycleof__()` and `__super_loop_monitor__()`, because `__PLOOC_VA_NUM_ARGS()` doesn't report `0` when passed with no argument. 
 
 ```c
-#if __PLOOC_VA_NUM_ARGS() != 0
+#if !__COMPILER_HAS_GNU_EXTENSIONS__
 #warning Please enable GNC extensions that is required by __cycleof__() and \
 __super_loop_monitor__()
 #endif
 ```
 
-11. It is nice to add macro definition `__PERF_COUNTER__` to your project GLOBALLY. It helps other modules to detect the existence of perf_counter. For Example, LVGL [`lv_conf_cmsis.h`](https://github.com/lvgl/lvgl/blob/d367bb7cf17dc34863f4439bba9b66a820088951/env_support/cmsis-pack/lv_conf_cmsis.h#L81-L99) use this macro to detect perf_counter and uses `get_system_ms()` to implement `lv_tick_get()`.
-11. It is nice to add `-include "perfc_common.h"` (or using equivalent option of your compiler) to the command line **GLOBALLY**.
+9. It is nice to add macro definition `__PERF_COUNTER__` to your project GLOBALLY. It helps other modules to detect the existence of perf_counter. For Example, LVGL [`lv_conf_cmsis.h`](https://github.com/lvgl/lvgl/blob/d367bb7cf17dc34863f4439bba9b66a820088951/env_support/cmsis-pack/lv_conf_cmsis.h#L81-L99) use this macro to detect perf_counter and uses `get_system_ms()` to implement `lv_tick_get()`.
+10. **[new]** It is nice to add `-include "perfc_common.h"` (or using equivalent option of your compiler) to the command line **GLOBALLY**.
 
 
 
@@ -498,8 +511,14 @@ __super_loop_monitor__()
 ![image-20220509012432408](./documents/pictures/RTE_cmsis_core) 
 
 6. Ensure the `SystemCoreClock` is updated with the same value as CPU frequency. 
-7. **IMPORTANT**: Make sure the `SysTick_CTRL_CLKSOURCE_Msk` bit ( bit 2) of `SysTick->CTRL` register is `1` that means SysTick runs with the same clock source as the target Cortex-M processor. 
-8. Initialize the perf_counter with a boolean value that indicates whether the user applications and/or RTOS have already occupied the SysTick.
+
+> [!IMPORTANT]
+>
+> Make sure the `SysTick_CTRL_CLKSOURCE_Msk` bit ( bit 2) of `SysTick->CTRL` register is `1` that means SysTick runs with the same clock source as the target Cortex-M processor. 
+
+
+
+7. Initialize the perf_counter with a boolean value that indicates whether the user applications and/or RTOS have already occupied the SysTick.
 
 ```c
 void main(void)
@@ -528,7 +547,7 @@ void main(void)
 }
 ```
 
-9. **IMPORTANT**: Please enable the **GNU extension** in your compiler. 
+8. Please enable the **GNU extension** in your compiler. 
 
    For Arm Compiler 5, please select both **C99 mode** and GNU extensions in the **Option for target dialogue** as shown below:
 
@@ -578,7 +597,11 @@ Since version v2.1.0, I removed the unnecessary bundle feature from the cmsis-pa
 1. please unselect ALL the performance components in RTE, press OK and close the uVision. 
 2. reopen the mdk project and select the perf_counter components in RTE
 
-### 3.3 How to feed the watchdog in perfc_delay_ms()?
+
+
+Sorry about this inconvinience. 
+
+### 3.3 [new] How to feed the watchdog in perfc_delay_ms()?
 
 Since version v2.5.0, it is possible to feed the watchdog while waiting for `perfc_delay_ms()` to return. You can implement a function called `perfc_delay_ms_user_code_in_loop()` in ANY of your C source file and use it to feed the watchdog:
 
@@ -598,8 +621,6 @@ bool perfc_delay_ms_user_code_in_loop(int64_t lRemainInMs)
 ```
 
 
-
-Sorry about this.  
 
 
 
