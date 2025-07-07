@@ -18,7 +18,6 @@ A dedicated performance counter for Cortex-M Systick. It shares the SysTick with
     - Performance Monitor Unit (PMU)
 
   - Easy to port to a different architecture with a porting template
-
 - **Provide Free Services**
   - Do **NOT** interfere with existing SysTick-based applications
 - **Support most of the arm compilers**
@@ -46,10 +45,9 @@ A dedicated performance counter for Cortex-M Systick. It shares the SysTick with
   - Macro to create atomicity for a specified code block, i.e. `__IRQ_SAFE{...}`.
   - Helper macros for C language extension:
     - VB like `with()`
-    - `foreach()`, `dimof(), `CONNECT()`
+    - `foreach()`, `dimof()`  and `CONNECT()`
     - C# like `using()`
     - simple overload feature of OOPC made out of ANSI-C99, `__PLOOC_VA_NUM_ARGS()`.
-    - add macros for PT
     - ...
   - A dedicated macro `__perfc_sync_barrier__()` for code barrier. 
 - **[new]** Adds C Language Extensions

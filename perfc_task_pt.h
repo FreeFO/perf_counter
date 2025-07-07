@@ -266,7 +266,7 @@ label_switch_start:                                                             
 typedef struct perfc_cpt_t {
     perfc_coroutine_t tCoroutine;
     uint8_t chState;
-}perfc_cpt_t;
+} perfc_cpt_t;
 
 #endif
 /*============================ GLOBAL VARIABLES ==============================*/
