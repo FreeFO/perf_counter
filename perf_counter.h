@@ -225,7 +225,7 @@ __asm(".global __ensure_systick_wrapper\n\t");
     \endcode
  */
 #define __cycleof__(__STR, ...)                                                 \
-            perfc_using(int64_t _ = get_system_ticks(), __cycle_count__ = _,          \
+            perfc_using(int64_t _ = get_system_ticks(), __cycle_count__ = _,    \
                 {__perfc_sync_barrier__();},                                    \
                 {                                                               \
                 __perfc_sync_barrier__();                                       \

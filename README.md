@@ -95,7 +95,7 @@ Here, [**ref 1**] is a small user code to read the measurement result via a loca
 ```c
     __cycleof__() {
         foreach(example_lv0_t, s_tItem, ptItem) {
-            printf("Processing item with ID = %d\r\n", _->chID);
+            __perf_counter_printf__("Processing item with ID = %d\r\n", _->chID);
         }
     }
 ```
@@ -117,10 +117,10 @@ You will see the measured result in the console:
         {
             lCycleResult = __cycle_count__;   /*< "__cycle_count__" stores the result */
         }) {
-        delay_us(1000ul);
+        perfc_delay_us(1000ul);
     }
 
-    printf("\r\n delay_us(1000ul) takes %lld cycles\r\n", lCycleResult);
+    __perf_counter_printf__("\r\n delay_us(1000ul) takes %lld cycles\r\n", lCycleResult);
 ```
 
 The result is read out from `__cycle_count__`and used in other place:
@@ -152,9 +152,9 @@ void main(void)
     ...
     while (1) {
         __cpu_usage__(10) {
-            delay_us(30000);
+            perfc_delay_us(30000);
         }
-        delay_us(70000);
+        perfc_delay_us(70000);
     }
     ...
 }
@@ -170,13 +170,13 @@ void main(void)
         
         __cpu_usage__(10, {
             float fUsage = __usage__; /*< "__usage__" stores the result */
-            printf("task 1 cpu usage %3.2f %%\r\n", (double)fUsage);
+            __perf_counter_printf__("task 1 cpu usage %3.2f %%\r\n", (double)fUsage);
         }) {
-            delay_us(30000);
+            perfc_delay_us(30000);
         }
         
 
-        delay_us(70000);
+        perfc_delay_us(70000);
     }
     ...
 }
@@ -223,7 +223,7 @@ void main(void)
 {
     init_cycle_counter(false);
 
-    printf("Run coremark\r\n");
+    __perf_counter_printf__("Run coremark\r\n");
 
 #ifdef __PERF_COUNTER_COREMARK__
     __cpu_perf__("Coremark") {
@@ -271,7 +271,7 @@ int main (void)
 
    /* Print 5 random numbers from 0 to 1024 */
    for( i = 0 ; i < n ; i++ ) {
-      printf("%d\n", rand() & 0x3FF);
+      __perf_counter_printf__("%d\n", rand() & 0x3FF);
    }
    
    return(0);
@@ -286,9 +286,9 @@ int main (void)
     do {
         int64_t tStart = get_system_ticks();
         __IRQ_SAFE {
-            printf("no interrupt \r\n");
+            __perf_counter_printf__("no interrupt \r\n");
         }
-        printf("used clock cycle: %d", (int32_t)(get_system_ticks() - tStart));
+        __perf_counter_printf__("used clock cycle: %d", (int32_t)(get_system_ticks() - tStart));
     } while(0);
 ```
 
@@ -296,16 +296,20 @@ This example shows how to use the delta value of `get_system_ticks()` to measure
 
 ```c
 #define __cycleof__(__STR, ...)                                                 \
-            using(int64_t _ = get_system_ticks(), __cycle_count__ = _,          \
-                _=_, {                                                          \
-                _ = get_system_ticks() - _;                                     \
+            perfc_using(int64_t _ = get_system_ticks(), __cycle_count__ = _,    \
+                {__perfc_sync_barrier__();},                                    \
+                {                                                               \
+                __perfc_sync_barrier__();                                       \
+                _ = get_system_ticks() - _ - g_nOffset;                         \
                 __cycle_count__ = _;                                            \
                 if (__PLOOC_VA_NUM_ARGS(__VA_ARGS__) == 0) {                    \
-                    printf("\r\n");                                             \
-                    printf("-[Cycle Report]");                                  \
-                    printf("--------------------------------------------\r\n"); \
-                    printf(__STR " total cycle count: %d [%08x]\r\n",           \
-                            (int)_, (int)_);                                    \
+                    __perf_counter_printf__("\r\n");                            \
+                    __perf_counter_printf__("-[Cycle Report]");                 \
+                    __perf_counter_printf__(                                    \
+                        "------------------------------------\r\n");            \
+                    __perf_counter_printf__(                                    \
+                        __STR " total cycle count: %ld [%08lx]\r\n",            \
+                            (long)_, (long)_);                                  \
                 } else {                                                        \
                     __VA_ARGS__                                                 \
                 };                                                              \
@@ -326,7 +330,7 @@ while(1) {
     /* return true every 1000 ms */
     if (perfc_is_time_out_ms(1000)) {
         /* print hello world every 1000 ms */
-        printf("\r\nHello world\r\n");
+        __perf_counter_printf__("\r\nHello world\r\n");
     }
 }
 ```
@@ -457,6 +461,7 @@ __super_loop_monitor__()
 ```
 
 11. It is nice to add macro definition `__PERF_COUNTER__` to your project GLOBALLY. It helps other modules to detect the existence of perf_counter. For Example, LVGL [`lv_conf_cmsis.h`](https://github.com/lvgl/lvgl/blob/d367bb7cf17dc34863f4439bba9b66a820088951/env_support/cmsis-pack/lv_conf_cmsis.h#L81-L99) use this macro to detect perf_counter and uses `get_system_ms()` to implement `lv_tick_get()`.
+11. It is nice to add `-include "perfc_common.h"` (or using equivalent option of your compiler) to the command line **GLOBALLY**.
 
 
 
@@ -523,7 +528,7 @@ void main(void)
 }
 ```
 
-9. **IMPORTANT**: Please enable the GNU extension in your compiler. 
+9. **IMPORTANT**: Please enable the **GNU extension** in your compiler. 
 
    For Arm Compiler 5, please select both **C99 mode** and GNU extensions in the **Option for target dialogue** as shown below:
 
@@ -536,7 +541,7 @@ For Arm Compiler 6, please select **gnu99** or **gnu11** in Language C drop-list
 Failed to do so, you will not only trigger the warning in `perf_counter.h`, but also lose the function correctness of `__cycleof__()` and `__super_loop_monitor__()`, because `__PLOOC_VA_NUM_ARGS()` doesn't report `0` when passed with no argument. 
 
 ```c
-#if __PLOOC_VA_NUM_ARGS() != 0
+#if !__COMPILER_HAS_GNU_EXTENSIONS__
 #warning Please enable GNC extensions, that is required by __cycleof__() and \
 __super_loop_monitor__()
 #endif
@@ -572,6 +577,25 @@ Since version v2.1.0, I removed the unnecessary bundle feature from the cmsis-pa
 
 1. please unselect ALL the performance components in RTE, press OK and close the uVision. 
 2. reopen the mdk project and select the perf_counter components in RTE
+
+### 3.3 How to feed the watchdog in perfc_delay_ms()?
+
+Since version v2.5.0, it is possible to feed the watchdog while waiting for `perfc_delay_ms()` to return. You can implement a function called `perfc_delay_ms_user_code_in_loop()` in ANY of your C source file and use it to feed the watchdog:
+
+```c
+bool perfc_delay_ms_user_code_in_loop(int64_t lRemainInMs)
+{
+    UNUSED_PARAM(lRemainInMs); /* the lRemainInMs tells you about the remaining time in ms */
+  
+    extern void feed_watchdog(void);
+  
+    feed_watchdog();
+  
+	  /* return false to exit the perfc_delay_ms() earlier */
+    /* usually, we just return true to wait until the end of the target period */
+    return true;
+}
+```
 
 
 

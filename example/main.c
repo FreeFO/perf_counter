@@ -145,17 +145,17 @@ int main (void)
     /*! demo of using() block */
     using(int a = 0,printf("========= On Enter =======\r\n"),
                     printf("========= On Leave =======\r\n")) {
-        printf("\t In Body a=%d \r\n", ++a);
+        __perf_counter_printf__("\t In Body a=%d \r\n", ++a);
     }
 
     __cycleof__("Calibration") {}
 
-    printf("\r\n\r\n\r\n\r\n");
+    __perf_counter_printf__("\r\n\r\n\r\n\r\n");
 
     /*! demo of __cycleof__() operation */
     __cycleof__() {
         foreach(s_tItem) {
-            printf("Processing item with ID = %d\r\n", _->chID);
+            __perf_counter_printf__("Processing item with ID = %d\r\n", _->chID);
         }
     }
 
@@ -165,10 +165,10 @@ int main (void)
         {
             iCycleResult = __cycle_count__;   /*< "__cycle_count__" stores the result */
         }) {
-        delay_us(1000ul);
+        perfc_delay_us(1000ul);
     }
 
-    printf("\r\n delay_us(1000ul) takes %d cycles\r\n", (int)iCycleResult);
+    __perf_counter_printf__("\r\n delay_us(1000ul) takes %d cycles\r\n", (int)iCycleResult);
 
     /*! demo of with block */
     with(example_lv0_t, &s_tItem[0], pitem) {
@@ -189,7 +189,7 @@ int main (void)
         __IRQ_SAFE {
             printf("no interrupt \r\n");
         }
-        printf("used clock cycle: %d", (int32_t)(get_system_ticks() - tStart));
+        __perf_counter_printf__("used clock cycle: %d", (int32_t)(get_system_ticks() - tStart));
     } while(0);
 
 #if __IS_COMPILER_ARM_COMPILER__
@@ -206,28 +206,28 @@ int main (void)
 
     while (1) {
         if (perfc_is_time_out_ms(10000)) {
-            printf("\r[%010lld]", get_system_ms());
+            __perf_counter_printf__("\r[%010lld]", get_system_ms());
         }
 
         __cpu_usage__(10) {
-            delay_us(30000);
+            perfc_delay_us(30000);
         }
         
         float fUsage = 0;
         __cpu_usage__(10, {
             fUsage = __usage__;
-            printf("task 1 cpu usage %3.2f %%\r\n", (double)fUsage);
+            __perf_counter_printf__("task 1 cpu usage %3.2f %%\r\n", (double)fUsage);
         }) {
-            delay_us(50000);
+            perfc_delay_us(50000);
         }
 
-        delay_us(20000);
+        perfc_delay_us(20000);
 
         fsm_rt_t tResult = perfc_coroutine_call((perfc_coroutine_t *)&s_tExampleCPT).nResult;
         if (fsm_rt_cpl == tResult) {
             size_t tStackRemain 
                 = perfc_coroutine_stack_remain((perfc_coroutine_t *)&s_tExampleCPT);
-            printf("\r\nCoroutine Stack Remain: %d\r\n", tStackRemain);
+            __perf_counter_printf__("\r\nCoroutine Stack Remain: %d\r\n", tStackRemain);
         }
 
         //pt_example_led_flash(&s_tExamplePT);
