@@ -54,6 +54,8 @@ A dedicated performance counter for Cortex-M Systick. It shares the SysTick with
   - A dedicated macro `__perfc_sync_barrier__()` for code barrier. 
 - **[new]** Adds C Language Extensions
   - Adds Coroutine support
+    - Adds watermark to stack and users can call `perfc_coroutine_stack_remain()` to get the stack usage info.
+    - Defining macro `__PERFC_COROUTINE_NO_STACK_CHECK__` in **compilation command line** disables the stack-checking feature. 
   - Adds ProtoThread support with/without the coroutine.
 
 

@@ -73,6 +73,7 @@ int perfc_coroutine_init(   perfc_coroutine_t *ptTask,
         pStackTop -= nJmpbufSize;
         ptTask->ptYieldPoint = (jmp_buf *)pStackTop;
 
+    #if !defined(__PERFC_COROUTINE_NO_STACK_CHECK__)
         // fill the stack with watermark
         do {
             pStackBase = (void *)(((uintptr_t)pStackBase + 7) & (~((uintptr_t)0x07)));
@@ -82,6 +83,7 @@ int perfc_coroutine_init(   perfc_coroutine_t *ptTask,
                 *pwStackPointer++ = 0xDEADBEEF;
             }
         } while(0);
+    #endif
 
         typedef volatile struct {
             perfc_coroutine_t *ptTask;
@@ -141,6 +143,7 @@ size_t perfc_coroutine_stack_remain(perfc_coroutine_t *ptTask)
 
     size_t nDWordCount = 0;
 
+#if !defined(__PERFC_COROUTINE_NO_STACK_CHECK__)
     uint64_t *pdwCanary = (uint64_t *)
             (   ((uintptr_t)(ptTask->pStackBase) + 7)
             &   (~((uintptr_t)0x07)));
@@ -148,8 +151,10 @@ size_t perfc_coroutine_stack_remain(perfc_coroutine_t *ptTask)
     while(*pdwCanary++ == 0xDEADBEEFDEADBEEFul) {
         nDWordCount++;
     }
+#endif
 
     return nDWordCount * sizeof(uint64_t);
+
 }
 
 perfc_coroutine_rt_t perfc_coroutine_call(perfc_coroutine_t *ptTask)
@@ -170,6 +175,7 @@ perfc_coroutine_rt_t perfc_coroutine_call(perfc_coroutine_t *ptTask)
     }
 
     /* perform stack overflow detection */
+#if !defined(__PERFC_COROUTINE_NO_STACK_CHECK__)
     do {
         uint64_t *pdwCanary = (uint64_t *)
             (   ((uintptr_t)(ptTask->pStackBase) + 7)
@@ -179,6 +185,7 @@ perfc_coroutine_rt_t perfc_coroutine_call(perfc_coroutine_t *ptTask)
             perf_coroutine_report_error(ptTask, PERFC_CR_ERR_STACK_OVERFLOW);
         }
     } while(0);
+#endif
 
     return ptTask->tReturn;
 }
