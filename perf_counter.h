@@ -121,157 +121,21 @@ extern "C" {
 #   define MAX(__a, __b)  ((__a) >= (__b) ? (__a) : (__b))
 #endif
 
-
-#undef __CONNECT2
-#undef __CONNECT3
-#undef __CONNECT4
-#undef __CONNECT5
-#undef __CONNECT6
-#undef __CONNECT7
-#undef __CONNECT8
-#undef __CONNECT9
-
-#undef CONNECT2
-#undef CONNECT3
-#undef CONNECT4
-#undef CONNECT5
-#undef CONNECT6
-#undef CONNECT7
-#undef CONNECT8
-#undef CONNECT9
-
-#undef CONNECT
-
-#undef __MACRO_EXPANDING
-#define __MACRO_EXPANDING(...)                      __VA_ARGS__
-
-#define __CONNECT2(__A, __B)                        __A##__B
-#define __CONNECT3(__A, __B, __C)                   __A##__B##__C
-#define __CONNECT4(__A, __B, __C, __D)              __A##__B##__C##__D
-#define __CONNECT5(__A, __B, __C, __D, __E)         __A##__B##__C##__D##__E
-#define __CONNECT6(__A, __B, __C, __D, __E, __F)    __A##__B##__C##__D##__E##__F
-#define __CONNECT7(__A, __B, __C, __D, __E, __F, __G)                           \
-                                                    __A##__B##__C##__D##__E##__F##__G
-#define __CONNECT8(__A, __B, __C, __D, __E, __F, __G, __H)                      \
-                                                    __A##__B##__C##__D##__E##__F##__G##__H
-#define __CONNECT9(__A, __B, __C, __D, __E, __F, __G, __H, __I)                 \
-                                                    __A##__B##__C##__D##__E##__F##__G##__H##__I
-
-#define ALT_CONNECT2(__A, __B)              __CONNECT2(__A, __B)
-#define CONNECT2(__A, __B)                  __CONNECT2(__A, __B)
-#define CONNECT3(__A, __B, __C)             __CONNECT3(__A, __B, __C)
-#define CONNECT4(__A, __B, __C, __D)        __CONNECT4(__A, __B, __C, __D)
-#define CONNECT5(__A, __B, __C, __D, __E)   __CONNECT5(__A, __B, __C, __D, __E)
-#define CONNECT6(__A, __B, __C, __D, __E, __F)                                  \
-                                            __CONNECT6(__A, __B, __C, __D, __E, __F)
-#define CONNECT7(__A, __B, __C, __D, __E, __F, __G)                             \
-                                            __CONNECT7(__A, __B, __C, __D, __E, __F, __G)
-#define CONNECT8(__A, __B, __C, __D, __E, __F, __G, __H)                        \
-                                            __CONNECT8(__A, __B, __C, __D, __E, __F, __G, __H)
-#define CONNECT9(__A, __B, __C, __D, __E, __F, __G, __H, __I)                   \
-                                            __CONNECT9(__A, __B, __C, __D, __E, __F, __G, __H, __I)
-
-#define CONNECT(...)                                                            \
-            ALT_CONNECT2(CONNECT, __PLOOC_VA_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
-
-#undef __using1
-#undef __using2
-#undef __using3
-#undef __using4
-#undef using
-
-#define __using1(__declare)                                                     \
-            for (__declare, *CONNECT3(__using_, __LINE__,_ptr) = NULL;          \
-                 CONNECT3(__using_, __LINE__,_ptr)++ == NULL;                   \
-                )
-
-#define __using2(__declare, __on_leave_expr)                                    \
-            for (__declare, *CONNECT3(__using_, __LINE__,_ptr) = NULL;          \
-                 CONNECT3(__using_, __LINE__,_ptr)++ == NULL;                   \
-                 (__on_leave_expr)                                              \
-                )
-
-#define __using3(__declare, __on_enter_expr, __on_leave_expr)                   \
-            for (__declare, *CONNECT3(__using_, __LINE__,_ptr) = NULL;          \
-                 CONNECT3(__using_, __LINE__,_ptr)++ == NULL ?                  \
-                    ((__on_enter_expr),1) : 0;                                  \
-                 (__on_leave_expr)                                              \
-                )
-
-#define __using4(__dcl1, __dcl2, __on_enter_expr, __on_leave_expr)              \
-            for (__dcl1, __dcl2, *CONNECT3(__using_, __LINE__,_ptr) = NULL;     \
-                 CONNECT3(__using_, __LINE__,_ptr)++ == NULL ?                  \
-                    ((__on_enter_expr),1) : 0;                                  \
-                 (__on_leave_expr)                                              \
-                )
-
-#define using(...)                                                              \
-                CONNECT2(__using, __PLOOC_VA_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
-
-
-#undef __with2
-#undef __with3
-#undef with
-
-#define __with1(__addr)                                                         \
-            using(__typeof__(*__addr) *_=(__addr))
-
-#define __with2(__type, __addr)                                                 \
-            using(__type *_=(__addr))
-#define __with3(__type, __addr, __item)                                         \
-            using(__type *_=(__addr), *__item = _, _=_,_=_ )
-
-#define with(...)                                                               \
-            CONNECT2(__with, __PLOOC_VA_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
-
-#undef _
-
 #ifndef dimof
 #   define dimof(__array)          (sizeof(__array)/sizeof(__array[0]))
 #endif
 
 
-#define SAFE_NAME(__NAME)           CONNECT3(__,__NAME,__LINE__)
-#define PERFC_SAFE_NAME(__name)     CONNECT3(__,__name,__LINE__)
-
-#undef foreach2
-#undef foreach3
-#undef foreach
-
-#define foreach1(__array)                                                       \
-            using(__typeof__(__array[0]) *_ = __array)                          \
-            for (   uint_fast32_t PERFC_SAFE_NAME(count) = dimof(__array);      \
-                    PERFC_SAFE_NAME(count) > 0;                                 \
-                    _++, PERFC_SAFE_NAME(count)--                               \
-                )
-
-#define foreach2(__type, __array)                                               \
-            using(__type *_ = __array)                                          \
-            for (   uint_fast32_t PERFC_SAFE_NAME(count) = dimof(__array);      \
-                    PERFC_SAFE_NAME(count) > 0;                                 \
-                    _++, PERFC_SAFE_NAME(count)--                               \
-                )
-
-#define foreach3(__type, __array, __item)                                       \
-            using(__type *_ = __array, *__item = _, _ = _, _ = _ )              \
-            for (   uint_fast32_t PERFC_SAFE_NAME(count) = dimof(__array);      \
-                    PERFC_SAFE_NAME(count) > 0;                                 \
-                    _++, __item = _, PERFC_SAFE_NAME(count)--                   \
-                )
-
-#define foreach(...)                                                            \
-            CONNECT2(foreach, __PLOOC_VA_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
-
 #ifndef safe_atom_code
 #   define safe_atom_code()                                                     \
-            using(  perfc_global_interrupt_status_t SAFE_NAME(temp) =           \
+            perfc_using(  perfc_global_interrupt_status_t SAFE_NAME(temp) =     \
                         perfc_port_disable_global_interrupt(),                  \
                     perfc_port_resume_global_interrupt(SAFE_NAME(temp)))
 #endif
 
 #ifndef __IRQ_SAFE
 #   define __IRQ_SAFE                                                           \
-            using(  perfc_global_interrupt_status_t SAFE_NAME(temp) =           \
+            perfc_using(  perfc_global_interrupt_status_t SAFE_NAME(temp) =     \
                         perfc_port_disable_global_interrupt(),                  \
                     perfc_port_resume_global_interrupt(SAFE_NAME(temp)))
 #endif
@@ -324,6 +188,22 @@ __asm(".global __ensure_systick_wrapper\n\t");
 #define delay_us(__us)          perfc_delay_us(__us)
 
 #define delay_ms(__ms)          perfc_delay_ms(__ms)
+
+#ifndef CONNECT
+#   define CONNECT    PERFC_CONNECT
+#endif
+
+#ifndef using
+#   define using perfc_using
+#endif
+
+#ifndef with
+#   define with perfc_with
+#endif
+
+#ifndef foreach
+#   define with perfc_foreach
+#endif
 /*! @} */
 
 /*!
@@ -345,7 +225,7 @@ __asm(".global __ensure_systick_wrapper\n\t");
     \endcode
  */
 #define __cycleof__(__STR, ...)                                                 \
-            using(int64_t _ = get_system_ticks(), __cycle_count__ = _,          \
+            perfc_using(int64_t _ = get_system_ticks(), __cycle_count__ = _,          \
                 {__perfc_sync_barrier__();},                                    \
                 {                                                               \
                 __perfc_sync_barrier__();                                       \
@@ -385,7 +265,7 @@ __asm(".global __ensure_systick_wrapper\n\t");
     static int64_t  PERFC_SAFE_NAME(s_lTimestamp) = 0,                          \
                     PERFC_SAFE_NAME(s_lTotal) = 0;                              \
     static uint32_t PERFC_SAFE_NAME(s_wLoopCounter) = (__CNT);                  \
-    using(float __usage__ = 0, ({                                               \
+    perfc_using(float __usage__ = 0, ({                                               \
     if (0 == PERFC_SAFE_NAME(s_wLoopCounter)) {                                 \
         __usage__ = (float)((double)PERFC_SAFE_NAME(s_lTotal)                   \
                         / (double)(     get_system_ticks()                      \
@@ -468,7 +348,7 @@ __asm(".global __ensure_systick_wrapper\n\t");
  * \return bool whether it is timeout
  */
 #define perfc_is_time_out_ms(...)                                               \
-            CONNECT2(perfc_is_time_out_ms, __PLOOC_VA_NUM_ARGS(__VA_ARGS__))    \
+            PERFC_CONNECT2(perfc_is_time_out_ms, __PLOOC_VA_NUM_ARGS(__VA_ARGS__))    \
                 (__VA_ARGS__)
 
 /*!
@@ -519,9 +399,13 @@ __asm(".global __ensure_systick_wrapper\n\t");
  * \return bool whether it is timeout
  */
 #define perfc_is_time_out_us(...)                                               \
-            CONNECT2(perfc_is_time_out_us, __PLOOC_VA_NUM_ARGS(__VA_ARGS__))    \
+            PERFC_CONNECT2(perfc_is_time_out_us, __PLOOC_VA_NUM_ARGS(__VA_ARGS__))    \
                 (__VA_ARGS__)
 
+
+#if __C_LANGUAGE_EXTENSIONS_PERFC_COROUTINE__
+#   define perfc_delay_ms(__ms, ...)        __perfc_delay_ms((__ms), ##__VA_ARGS__)
+#endif
 
 /*! @} */
 
@@ -532,13 +416,13 @@ __asm(".global __ensure_systick_wrapper\n\t");
  * @{
  */
 #define __super_loop_monitor__(__N, ...)                                        \
-    using(                                                                      \
+    perfc_using(                                                                      \
         struct {                                                                \
             int64_t lStart;                                                     \
             int64_t lTaskUsedCycles;                                            \
             int64_t lTimeElapsed;                                               \
         } __cpu_usage__ = {.lStart = get_system_ticks()})                       \
-    using(int PERFC_SAFE_NAME(cnt) = (__N))                                     \
+    perfc_using(int PERFC_SAFE_NAME(cnt) = (__N))                                     \
     for(start_task_cycle_counter();; ({                                         \
         if (!(--PERFC_SAFE_NAME(cnt))) {                                        \
             __cpu_usage__.lTimeElapsed                                          \
@@ -628,7 +512,7 @@ extern int64_t get_system_ticks(void);
  *!           official header file, i.e. time.h, I use a compatible prototype
  *!           after I checked the AAPCS spec. So, the return of the clock() is
  *!           int64_t, which will use the R0 to store the lower 32bits and R1
- *!           to store the higher 32bits. When you are using the prototype from
+ *!           to store the higher 32bits. When you are perfc_using the prototype from
  *!           timer.h, caller will only take the lower 32bits stored in R0 and
  *!           the higher 32bits stored in R1 will be ignored.
  *!
@@ -665,9 +549,6 @@ int64_t stop_cycle_counter(void)
 
     return lTemp - g_nOffset;
 }
-
-
-
 
 /*! @} */
 
@@ -706,7 +587,11 @@ extern void perfc_delay_us(uint32_t wUs);
  * \brief delay specified time in millisecond
  * \param[in] wMs time in millisecond
  */
-extern void perfc_delay_ms(uint32_t nMs);
+#if __C_LANGUAGE_EXTENSIONS_PERFC_COROUTINE__
+extern void __perfc_delay_ms(uint32_t wMs, perfc_coroutine_t *ptCoroutine);
+#else
+extern void perfc_delay_ms(uint32_t wMs);
+#endif
 
 /*!
  * \brief convert ticks of a reference timer to millisecond
@@ -908,11 +793,11 @@ extern int64_t __stop_task_cycle_counter(task_cycle_info_t *ptInfo);
  *  \note    - Usually the perf_counter can initialise itself with the help of
  *           __attribute__((constructor(255))), this works fine in Arm Compiler
  *           5 (armcc), Arm Compiler 6 (armclang), arm gcc and llvm. It doesn't
- *           work for IAR. So, when you are using IAR, please call this function
+ *           work for IAR. So, when you are perfc_using IAR, please call this function
  *           manually to initialise the perf_counter service.
  *
  *  \note    - Perf_counter library assumes that:
- *           1. Your project has already using SysTick
+ *           1. Your project has already perfc_using SysTick
  *           2. It assumes that you have already implemented the SysTick_Handler
  *           3. It assumes that you have enabled the exception handling for
  *              SysTick.
@@ -935,14 +820,14 @@ extern bool perfc_init(bool bIsSysTimerOccupied);
 /*!
  * \brief a system timer overflow handler
  *
- * \note  - if you are using a compiler other than armcc or armclang, e.g. iar,
+ * \note  - if you are perfc_using a compiler other than armcc or armclang, e.g. iar,
  *        arm gcc etc, the systick_wrapper_ual.o doesn't work with the linker
  *        of your target toolchain as it use the $Super$$ which is only supported
  *        by armlink. For this condition, you have to manually put this function
  *        into your existing SysTick_Handler to make the perf_counter library
  *        work.
  *
- * \note  - if you are using Arm Compiler 5 (armcc) or Arm Compiler 6 (armclang)
+ * \note  - if you are perfc_using Arm Compiler 5 (armcc) or Arm Compiler 6 (armclang)
  *        you do NOT have to insert this function into your SysTick_Handler,
  *        the systick_wrapper_ual.s will do the work for you.
  */

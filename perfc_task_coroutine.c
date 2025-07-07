@@ -192,7 +192,10 @@ perfc_coroutine_rt_t perfc_coroutine_call(perfc_coroutine_t *ptTask)
 
 void perfc_coroutine_yield(perfc_coroutine_t *ptTask)
 {
-    assert(NULL != ptTask);
+    if (NULL == ptTask) {
+        return ;
+    }
+
     if (0 == setjmp(*(ptTask->ptYieldPoint))) {
         /* yeild */
         assert(NULL != ptTask->ptCaller);

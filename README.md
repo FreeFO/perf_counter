@@ -30,7 +30,8 @@ A dedicated performance counter for Cortex-M Systick. It shares the SysTick with
   - **CMSIS-Pack is available**
   - **RT-Thread package is avaialble**
 - **Time-based services**
-  - `delay_us()` and `delay_ms()` with **64bit return value**.
+  - `perfc_delay_us()` and `perfc_delay_ms()` with **64bit return value**.
+    - **[new]** Adds weak entries `perfc_delay_us_user_code_in_loop()` and `perfc_delay_ms_user_code_in_loop()` for users to override, e.g. feeding the watchdog. 
   - Provides Timestamp services via `get_system_ticks()`, `get_system_us` and `get_system_ms()`.
 - **Support both RTOS and bare-metal environments**
   - Support SysTick Reconfiguration
@@ -59,10 +60,16 @@ A dedicated performance counter for Cortex-M Systick. It shares the SysTick with
 
 ### Updates
 
-- Following functions are deprecated, please use the version with `perfc_` as prefix:
+- Following functions/macros are **deprecated**, please use the version with `perfc_` as prefix:
   - `init_cycle_counter()` -> `perfc_init()`
   - `delay_us()` -> `perfc_delay_us()`
   - `delay_ms()` -> `perfc_delay_ms()`
+  - `CONNECT()` -> `PERFC_CONNECT()`
+  - `using()` -> `perfc_using()`
+  - `with()` -> `perfc_with()`
+  - `foreach()` -> `perfc_foreach()`
+
+  
 
 
 

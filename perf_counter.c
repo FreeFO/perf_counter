@@ -85,18 +85,25 @@ volatile int64_t g_lLastTimeStamp = 0;
 /* low level interface for porting */
 extern
 uint32_t perfc_port_get_system_timer_freq(void);
+
 extern
 int64_t perfc_port_get_system_timer_top(void);
+
 extern
 bool perfc_port_is_system_timer_ovf_pending(void);
+
 extern
 bool perfc_port_init_system_timer(bool bTimerOccupied);
+
 extern
 int64_t perfc_port_get_system_timer_elapsed(void);
+
 extern
 void perfc_port_clear_system_timer_ovf_pending(void);
+
 extern
 void perfc_port_stop_system_timer_counting(void);
+
 extern
 void perfc_port_clear_system_timer_counter(void);
 
@@ -143,6 +150,7 @@ uint32_t perfc_get_systimer_frequency(void)
 }
 
 __WEAK
+__attribute__((noinline))
 void __perf_os_patch_init(void)
 {
 }
@@ -233,6 +241,14 @@ void __perf_counter_init(void)
     perfc_init(true);
 }
 
+__WEAK
+__attribute__((noinline))
+bool perfc_delay_us_user_code_in_loop(int64_t lRemainInUs)
+{
+    UNUSED_PARAM(lRemainInUs);
+
+    return true;
+}
 
 void perfc_delay_us(uint32_t wUs)
 {
@@ -248,10 +264,31 @@ void perfc_delay_us(uint32_t wUs)
     lUs -= iCompensate;
 
     lUs += get_system_ticks();
-    while(get_system_ticks() < lUs);
+    do {
+        int64_t lTimestamp = get_system_ticks();
+        if (lTimestamp >= lUs) {
+            break;
+        }
+        if (!perfc_delay_us_user_code_in_loop( perfc_convert_ticks_to_us(lUs - lTimestamp) )) {
+            break;
+        }
+    } while(1);
 }
 
+__WEAK
+__attribute__((noinline))
+bool perfc_delay_ms_user_code_in_loop(int64_t lRemainInMs)
+{
+    UNUSED_PARAM(lRemainInMs);
+
+    return true;
+}
+
+#if __C_LANGUAGE_EXTENSIONS_PERFC_COROUTINE__
+void __perfc_delay_ms(uint32_t wMs, perfc_coroutine_t *ptCoroutine)
+#else
 void perfc_delay_ms(uint32_t wMs)
+#endif
 {
     int64_t lMs = (int64_t)wMs * (int64_t)s_wMSUnit;
     int32_t iCompensate = g_nOffset > PERF_CNT_DELAY_US_COMPENSATION
@@ -265,7 +302,18 @@ void perfc_delay_ms(uint32_t wMs)
     lMs -= iCompensate;
 
     lMs += get_system_ticks();
-    while(get_system_ticks() < lMs);
+    do {
+        int64_t lTimestamp = get_system_ticks();
+        if (lTimestamp >= lMs) {
+            break;
+        }
+        if (!perfc_delay_ms_user_code_in_loop( perfc_convert_ticks_to_ms(lMs - lTimestamp) )) {
+            break;
+        }
+#if __C_LANGUAGE_EXTENSIONS_PERFC_COROUTINE__
+        perfc_coroutine_yield(ptCoroutine);
+#endif
+    } while(1);
 }
 
 __attribute__((noinline))
