@@ -86,7 +86,7 @@ PERFC_CPT_BEGIN(this)
     do {
         void *ptResource = NULL;
     
-    PERFC_CPT_WAIT_RESOURCE_UNTIL( 
+    PERFC_CPT_WAIT_FOR_RES_UNTIL( 
         (ptResource != NULL),               /* quit condition */
         ptResource = malloc(100);          /* try to allocate memory */
     )

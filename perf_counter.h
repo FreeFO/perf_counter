@@ -202,7 +202,7 @@ __asm(".global __ensure_systick_wrapper\n\t");
 #endif
 
 #ifndef foreach
-#   define with perfc_foreach
+#   define foreach perfc_foreach
 #endif
 /*! @} */
 
