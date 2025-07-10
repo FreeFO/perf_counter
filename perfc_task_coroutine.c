@@ -55,6 +55,8 @@ void __perfc_coroutine_loop(
                     perfc_coroutine_t *ptCoroutine,
                     perfc_coroutine_task_handler_t *fnHandler)
 {
+    jmp_buf tYieldPoint;
+    ptCoroutine->ptYieldPoint = &tYieldPoint;
     do {
         /* set the initial yield point */
         if (0 == setjmp(*(jmp_buf *)(ptCoroutine->ptYieldPoint))) {
@@ -87,10 +89,7 @@ int perfc_coroutine_init(   perfc_coroutine_t *ptTask,
         uintptr_t pStackTop = (uintptr_t)pStackBase + tSizeInByte;
         /* force 8bytes alignment */
         pStackTop &= (~((uintptr_t)0x07));
-        // add Yieldpoint
-        pStackTop -= nJmpbufSize;
-        ptTask->ptYieldPoint = (jmp_buf *)pStackTop;
-        pStackTop -= 16;
+        pStackTop -= 8;
 
     #if !defined(__PERFC_COROUTINE_NO_STACK_CHECK__)
         // fill the stack with watermark
