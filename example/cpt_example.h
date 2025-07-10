@@ -39,7 +39,9 @@ typedef struct {
 /*============================ PROTOTYPES ====================================*/
 
 extern
-cpt_led_flash_cb_t *cpt_example_led_flash_init(cpt_led_flash_cb_t *ptThis);
+cpt_led_flash_cb_t * cpt_example_led_flash_init(cpt_led_flash_cb_t *ptThis,
+                                                void *pStack,
+                                                size_t nStackSize);
 
 extern
 fsm_rt_t cpt_example_led_flash(cpt_led_flash_cb_t *ptThis);

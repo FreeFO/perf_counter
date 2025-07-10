@@ -244,7 +244,7 @@ __WEAK
 __attribute__((noinline))
 void __perfc_port_set_sp(uintptr_t nSP)
 {
-    return __set_MSP(nSP);
+    __set_MSP(nSP);
 }
 
 #endif

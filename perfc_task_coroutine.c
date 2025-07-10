@@ -48,6 +48,24 @@ void __perfc_port_set_sp(uintptr_t nSP);
 
 /*============================ IMPLEMENTATION ================================*/
 
+__attribute__((noreturn))
+__attribute__((noinline))
+static 
+void __perfc_coroutine_loop(
+                    perfc_coroutine_t *ptCoroutine,
+                    perfc_coroutine_task_handler_t *fnHandler)
+{
+    do {
+        /* set the initial yield point */
+        if (0 == setjmp(*(jmp_buf *)(ptCoroutine->ptYieldPoint))) {
+            /* the setup phase, return to exit point */
+            longjmp(*(jmp_buf *)(ptCoroutine->ptCaller), 1);
+        }
+        ptCoroutine->tReturn.nResult = (*fnHandler)(ptCoroutine);
+    } while(1);
+}
+
+
 __attribute__((noinline))
 int perfc_coroutine_init(   perfc_coroutine_t *ptTask, 
                             perfc_coroutine_task_handler_t *fnHandler,
@@ -72,6 +90,7 @@ int perfc_coroutine_init(   perfc_coroutine_t *ptTask,
         // add Yieldpoint
         pStackTop -= nJmpbufSize;
         ptTask->ptYieldPoint = (jmp_buf *)pStackTop;
+        pStackTop -= 16;
 
     #if !defined(__PERFC_COROUTINE_NO_STACK_CHECK__)
         // fill the stack with watermark
@@ -89,32 +108,33 @@ int perfc_coroutine_init(   perfc_coroutine_t *ptTask,
             perfc_coroutine_t *ptTask;
             perfc_coroutine_task_handler_t *fnHandler;
             uintptr_t pnTaskStack;
+            void (*fnLoop)(
+                    perfc_coroutine_t *ptCoroutine,
+                    perfc_coroutine_task_handler_t *fnHandler);
         } __local_t;
         
         static __local_t s_tWhiteBoard;
         static __local_t * volatile s_ptLocal = &s_tWhiteBoard;
+        static __local_t * volatile s_ptLocal2 = &s_tWhiteBoard;
 
         #define local   (*s_ptLocal)
+        #define local2  (*s_ptLocal2)
         
         __IRQ_SAFE {
             local.pnTaskStack = pStackTop;
             local.fnHandler = fnHandler;
             local.ptTask = ptTask;
+            local.fnLoop = &__perfc_coroutine_loop;
             jmp_buf tReturnPoint;
 
+            ptTask->ptCaller = &tReturnPoint;
             if (setjmp(*(jmp_buf *)&tReturnPoint) == 0) {
 
-                ptTask->ptCaller = &tReturnPoint;
                 __perfc_port_set_sp(local.pnTaskStack);
-                
-                do {
-                    /* set the initial yield point */
-                    if (0 == setjmp(*(jmp_buf *)(local.ptTask->ptYieldPoint))) {
-                        /* the setup phase, return to exit point */
-                        longjmp(*(jmp_buf *)(local.ptTask->ptCaller), 1);
-                    }
-                    local.ptTask->tReturn.nResult = (*local.fnHandler)(local.ptTask);
-                } while(1);
+
+                local2.fnLoop(local2.ptTask, local2.fnHandler);
+                assert(false);
+                while(1) __NOP();
             }
         }
 
@@ -164,8 +184,9 @@ perfc_coroutine_rt_t perfc_coroutine_call(perfc_coroutine_t *ptTask)
     }
 
     jmp_buf tReturnPoint;
+    ptTask->ptCaller = &tReturnPoint;
+
     if (0 == setjmp(tReturnPoint)) {
-        ptTask->ptCaller = &tReturnPoint;
 
         /* go to the yield point */
         longjmp(*(ptTask->ptYieldPoint), 1);

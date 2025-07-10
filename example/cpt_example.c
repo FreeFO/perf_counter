@@ -44,10 +44,9 @@ extern "C" {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
-__attribute__((section(".bss.stacks.coroutine")))
-uint64_t s_dwStack[128];
-
-cpt_led_flash_cb_t * cpt_example_led_flash_init(cpt_led_flash_cb_t *ptThis)
+cpt_led_flash_cb_t * cpt_example_led_flash_init(cpt_led_flash_cb_t *ptThis,
+                                                void *pStack,
+                                                size_t nStackSize)
 {
     if (NULL == ptThis) {
         return NULL;
@@ -57,8 +56,8 @@ cpt_led_flash_cb_t * cpt_example_led_flash_init(cpt_led_flash_cb_t *ptThis)
 
     perfc_coroutine_init(&this.use_as__perfc_cpt_t.tCoroutine,
                          (perfc_coroutine_task_handler_t *)&cpt_example_led_flash,
-                         s_dwStack,
-                         sizeof(s_dwStack));
+                         pStack,
+                         nStackSize);
 
     return ptThis;
 }
