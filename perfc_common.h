@@ -20,6 +20,9 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include <stdint.h>
+#include <stdlib.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -370,10 +373,54 @@ extern "C" {
                             __PLOOC_VA_NUM_ARGS(__VA_ARGS__))                   \
                                 (__VA_ARGS__)
 
+/*!
+ * \brief measure the stack usage of the given code segement
+ * \param[in] __STR a name for this measurement
+ * \param[in] __perfc_stack_limit the stack based address (stack limit)
+ * \param[in] ... an optional code segement, in which we can read the measured
+ *                result from __stack_used__.
+ */
+#define __stack_usage__(__STR, __perfc_stack_base, ...)                         \
+                                                                                \
+        perfc_using(uintptr_t __stack_used__ = 0,                               \
+            PERFC_SAFE_NAME(nSP) = __perfc_port_get_sp(),                       \
+            {perfc_stack_fill(  PERFC_SAFE_NAME(nSP),                           \
+                                (uintptr_t)(__perfc_stack_base));},             \
+            {                                                                   \
+                __stack_used__                                                  \
+                    = PERFC_SAFE_NAME(nSP)                                      \
+                    - (uintptr_t)(__perfc_stack_base)                           \
+                    - perfc_stack_remain((uintptr_t)(__perfc_stack_base));      \
+                if (__PLOOC_VA_NUM_ARGS(__VA_ARGS__) == 0) {                    \
+                    __perf_counter_printf__(                                    \
+                        "\r\n-------------------------------------\r\n"         \
+                        __STR " Stack Used: %d bytes\r\n", __stack_used__);     \
+                } else {                                                        \
+                    __VA_ARGS__;                                                \
+                }                                                               \
+            })
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern
+__attribute__((noinline))
+uintptr_t __perfc_port_get_sp(void);
+
+extern
+__attribute__((noinline))
+void __perfc_port_set_sp(uintptr_t nSP);
+
+extern
+__attribute__((noinline))
+void perfc_stack_fill(uintptr_t nSP, uintptr_t nStackLimit);
+
+extern
+__attribute__((noinline))
+size_t perfc_stack_remain(uintptr_t nStackLimit);
+
 /*============================ IMPLEMENTATION ================================*/
 
 /*! @} */

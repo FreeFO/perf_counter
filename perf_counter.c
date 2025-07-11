@@ -460,6 +460,35 @@ bool __perfc_is_time_out(int64_t lPeriod, int64_t *plTimestamp, bool bAutoReload
     return false;
 }
 
+__attribute__((noinline))
+void perfc_stack_fill(uintptr_t nSP, uintptr_t nStackLimit)
+{
+    /* force 8bytes alignment */
+    nSP &= (~((uintptr_t)0x07));
+    nStackLimit = (nStackLimit + 7) & (~((uintptr_t)0x07));
+
+    uint32_t * pwStackPointer = (uint32_t *) nStackLimit;
+    while((uintptr_t)pwStackPointer < nSP) {
+        *pwStackPointer++ = 0xDEADBEEF;
+    }
+}
+
+__attribute__((noinline))
+size_t perfc_stack_remain(uintptr_t nStackLimit)
+{
+    size_t nDWordCount = 0;
+
+    uint64_t *pdwCanary = (uint64_t *)
+            (   ((uintptr_t)(nStackLimit) + 7)
+            &   (~((uintptr_t)0x07)));
+    
+    while(*pdwCanary++ == 0xDEADBEEFDEADBEEFul) {
+        nDWordCount++;
+    }
+
+    return nDWordCount * sizeof(uint64_t);
+}
+
 
 /// Setup timer hardware.
 /// \return       status (1=Success, 0=Failure)

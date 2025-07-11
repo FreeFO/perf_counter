@@ -38,14 +38,6 @@ extern "C" {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-extern
-__attribute__((noinline))
-uintptr_t __perfc_port_get_sp(void);
-
-extern
-__attribute__((noinline))
-void __perfc_port_set_sp(uintptr_t nSP);
-
 /*============================ IMPLEMENTATION ================================*/
 
 __attribute__((noreturn))
@@ -66,7 +58,6 @@ void __perfc_coroutine_loop(
         ptCoroutine->tReturn.nResult = (*fnHandler)(ptCoroutine);
     } while(1);
 }
-
 
 __attribute__((noinline))
 int perfc_coroutine_init(   perfc_coroutine_t *ptTask, 
@@ -92,15 +83,7 @@ int perfc_coroutine_init(   perfc_coroutine_t *ptTask,
         pStackTop -= 8;
 
     #if !defined(__PERFC_COROUTINE_NO_STACK_CHECK__)
-        // fill the stack with watermark
-        do {
-            pStackBase = (void *)(((uintptr_t)pStackBase + 7) & (~((uintptr_t)0x07)));
-            
-            uint32_t * pwStackPointer = (uint32_t *) pStackBase;
-            while((uintptr_t)pwStackPointer < pStackTop) {
-                *pwStackPointer++ = 0xDEADBEEF;
-            }
-        } while(0);
+        perfc_stack_fill(pStackTop, (uintptr_t)pStackBase);
     #endif
 
         typedef volatile struct {
@@ -160,21 +143,15 @@ size_t perfc_coroutine_stack_remain(perfc_coroutine_t *ptTask)
         return 0;
     }
 
-    size_t nDWordCount = 0;
-
 #if !defined(__PERFC_COROUTINE_NO_STACK_CHECK__)
-    uint64_t *pdwCanary = (uint64_t *)
-            (   ((uintptr_t)(ptTask->pStackBase) + 7)
-            &   (~((uintptr_t)0x07)));
-    
-    while(*pdwCanary++ == 0xDEADBEEFDEADBEEFul) {
-        nDWordCount++;
-    }
+    return perfc_stack_remain((uintptr_t)ptTask->pStackBase);
+#else
+    return 0;
 #endif
 
-    return nDWordCount * sizeof(uint64_t);
-
 }
+
+
 
 perfc_coroutine_rt_t perfc_coroutine_call(perfc_coroutine_t *ptTask)
 {

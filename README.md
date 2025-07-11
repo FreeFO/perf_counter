@@ -55,6 +55,7 @@ A dedicated template is provided to port the perf_counter to different architect
     - simple overload feature of OOPC made out of ANSI-C99, `__PLOOC_VA_NUM_ARGS()`.
     - ...
   - A dedicated macro `__perfc_sync_barrier__()` for code barrier. 
+  - **[new]** Adds a macro `__stack_usage__()` to measure the stack usage for a given code segment.
 - **[new]** Adds C Language Extensions
   - Adds Coroutine support
     - Adds watermark to stack and users can call `perfc_coroutine_stack_remain()` to get the stack usage info.

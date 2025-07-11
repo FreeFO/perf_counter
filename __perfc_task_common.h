@@ -96,7 +96,6 @@ void perfc_coroutine_yield(perfc_coroutine_t *ptTask);
 extern
 size_t perfc_coroutine_stack_remain(perfc_coroutine_t *ptTask);
 
-
 /*============================ IMPLEMENTATION ================================*/
 
 /*! @} */
