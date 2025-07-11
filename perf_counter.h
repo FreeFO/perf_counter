@@ -399,12 +399,12 @@ __asm(".global __ensure_systick_wrapper\n\t");
  * \return bool whether it is timeout
  */
 #define perfc_is_time_out_us(...)                                               \
-            PERFC_CONNECT2(perfc_is_time_out_us, __PLOOC_VA_NUM_ARGS(__VA_ARGS__))    \
-                (__VA_ARGS__)
+            PERFC_CONNECT2( perfc_is_time_out_us,                               \
+                            __PLOOC_VA_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
 
 
 #if __C_LANGUAGE_EXTENSIONS_PERFC_COROUTINE__
-#   define perfc_delay_ms(__ms, ...)        __perfc_delay_ms((__ms), ##__VA_ARGS__)
+#   define perfc_delay_ms(__ms, ...)    __perfc_delay_ms((__ms), ##__VA_ARGS__)
 #endif
 
 /*! @} */
