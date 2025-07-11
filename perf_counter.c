@@ -461,16 +461,23 @@ bool __perfc_is_time_out(int64_t lPeriod, int64_t *plTimestamp, bool bAutoReload
 }
 
 __attribute__((noinline))
-void perfc_stack_fill(uintptr_t nSP, uintptr_t nStackLimit)
+bool perfc_stack_fill(uintptr_t nSP, uintptr_t nStackLimit)
 {
     /* force 8bytes alignment */
     nSP &= (~((uintptr_t)0x07));
     nStackLimit = (nStackLimit + 7) & (~((uintptr_t)0x07));
 
+    if (nSP <= nStackLimit) {
+        /* stack overflow */
+        return false;
+    }
+
     uint32_t * pwStackPointer = (uint32_t *) nStackLimit;
-    while((uintptr_t)pwStackPointer < nSP) {
+    while((uintptr_t)pwStackPointer <= nSP) {
         *pwStackPointer++ = 0xDEADBEEF;
     }
+    
+    return true;
 }
 
 __attribute__((noinline))

@@ -21,6 +21,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 #ifdef __cplusplus
@@ -382,21 +383,34 @@ extern "C" {
  */
 #define __stack_usage__(__STR, __perfc_stack_base, ...)                         \
                                                                                 \
-        perfc_using(uintptr_t __stack_used__ = 0,                               \
+        perfc_using(uintptr_t __stack_used__ = (uintptr_t)-1,                   \
             PERFC_SAFE_NAME(nSP) = __perfc_port_get_sp(),                       \
             {perfc_stack_fill(  PERFC_SAFE_NAME(nSP),                           \
                                 (uintptr_t)(__perfc_stack_base));},             \
             {                                                                   \
-                __stack_used__                                                  \
-                    = PERFC_SAFE_NAME(nSP)                                      \
-                    - (uintptr_t)(__perfc_stack_base)                           \
-                    - perfc_stack_remain((uintptr_t)(__perfc_stack_base));      \
-                if (__PLOOC_VA_NUM_ARGS(__VA_ARGS__) == 0) {                    \
-                    __perf_counter_printf__(                                    \
-                        "\r\n-------------------------------------\r\n"         \
-                        __STR " Stack Used: %d bytes\r\n", __stack_used__);     \
+                if (PERFC_SAFE_NAME(nSP) <= (uintptr_t)(__perfc_stack_base)) {  \
+                    if (__PLOOC_VA_NUM_ARGS(__VA_ARGS__) == 0) {                \
+                        __perf_counter_printf__(                                \
+                            "\r\n-------------------------------------\r\n"     \
+                            __STR " Stack Overflow!!!"                          \
+                            " SP: [0x%08x] Stack Base: [0x%08x]\r\n",           \
+                            PERFC_SAFE_NAME(nSP),                               \
+                            (uintptr_t)(__perfc_stack_base));                   \
+                    } else {                                                    \
+                        __VA_ARGS__;                                            \
+                    }                                                           \
                 } else {                                                        \
-                    __VA_ARGS__;                                                \
+                    __stack_used__                                              \
+                        = PERFC_SAFE_NAME(nSP)                                  \
+                        - (uintptr_t)(__perfc_stack_base)                       \
+                        - perfc_stack_remain((uintptr_t)(__perfc_stack_base));  \
+                    if (__PLOOC_VA_NUM_ARGS(__VA_ARGS__) == 0) {                \
+                        __perf_counter_printf__(                                \
+                            "\r\n-------------------------------------\r\n"     \
+                            __STR " Stack Used: %d bytes\r\n", __stack_used__); \
+                    } else {                                                    \
+                        __VA_ARGS__;                                            \
+                    }                                                           \
                 }                                                               \
             })
 
@@ -415,7 +429,7 @@ void __perfc_port_set_sp(uintptr_t nSP);
 
 extern
 __attribute__((noinline))
-void perfc_stack_fill(uintptr_t nSP, uintptr_t nStackLimit);
+bool perfc_stack_fill(uintptr_t nSP, uintptr_t nStackLimit);
 
 extern
 __attribute__((noinline))
