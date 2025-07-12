@@ -414,6 +414,60 @@ extern "C" {
                 }                                                               \
             })
 
+/*!
+ * \brief measure the maximum stack usage (so far) for the given code segement
+ * \param[in] __STR a name for this measurement
+ * \param[in] __perfc_stack_limit the stack based address (stack limit)
+ * \param[in] ... an optional code segement, in which we can read the measured
+ *                result from __stack_used_max__.
+ */
+#define __stack_usage_max__(__STR, __perfc_stack_base, ...)                     \
+    perfc_using(uintptr_t PERFC_SAFE_NAME(__stack_used__) = (uintptr_t)-1,      \
+        PERFC_SAFE_NAME(nSP) = __perfc_port_get_sp(),                           \
+        {perfc_stack_fill(  PERFC_SAFE_NAME(nSP),                               \
+                            (uintptr_t)(__perfc_stack_base));},                 \
+        {                                                                       \
+            static size_t PERFC_SAFE_NAME(s_nStackUsedMax) = 0;                 \
+            if (PERFC_SAFE_NAME(nSP) <= (uintptr_t)(__perfc_stack_base)) {      \
+                PERFC_SAFE_NAME(s_nStackUsedMax) = (size_t)(-1);                \
+                if (__PLOOC_VA_NUM_ARGS(__VA_ARGS__) == 0) {                    \
+                    __perf_counter_printf__(                                    \
+                        "\r\n-------------------------------------\r\n"         \
+                        __STR " Stack Overflow!!!"                              \
+                        " SP: [0x%08x] Stack Base: [0x%08x]\r\n",               \
+                        PERFC_SAFE_NAME(nSP),                                   \
+                        (uintptr_t)(__perfc_stack_base));                       \
+                } else {                                                        \
+                    size_t __stack_used_max__ = (size_t)-1;                     \
+                    UNUSED_PARAM(__stack_used_max__);                           \
+                    __VA_ARGS__;                                                \
+                }                                                               \
+            } else {                                                            \
+                PERFC_SAFE_NAME(__stack_used__)                                 \
+                    = PERFC_SAFE_NAME(nSP)                                      \
+                    - (uintptr_t)(__perfc_stack_base)                           \
+                    - perfc_stack_remain((uintptr_t)(__perfc_stack_base));      \
+                if (    PERFC_SAFE_NAME(s_nStackUsedMax)                        \
+                   <    PERFC_SAFE_NAME(__stack_used__)) {                      \
+                    PERFC_SAFE_NAME(s_nStackUsedMax)                            \
+                        = PERFC_SAFE_NAME(__stack_used__);                      \
+                                                                                \
+                    size_t __stack_used_max__ = PERFC_SAFE_NAME(__stack_used__);\
+                    UNUSED_PARAM(__stack_used_max__);                           \
+                                                                                \
+                    if (__PLOOC_VA_NUM_ARGS(__VA_ARGS__) == 0) {                \
+                        __perf_counter_printf__(                                \
+                            "\r\n-------------------------------------\r\n"     \
+                            __STR                                               \
+                            " Stack Used Max: %d bytes\r\n",                    \
+                            __stack_used_max__);                                \
+                    } else {                                                    \
+                        __VA_ARGS__;                                            \
+                    }                                                           \
+                }                                                               \
+            }                                                                   \
+        })
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

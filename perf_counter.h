@@ -265,7 +265,7 @@ __asm(".global __ensure_systick_wrapper\n\t");
     static int64_t  PERFC_SAFE_NAME(s_lTimestamp) = 0,                          \
                     PERFC_SAFE_NAME(s_lTotal) = 0;                              \
     static uint32_t PERFC_SAFE_NAME(s_wLoopCounter) = (__CNT);                  \
-    perfc_using(float __usage__ = 0, ({                                               \
+    perfc_using(float __usage__ = 0, ({                                         \
     if (0 == PERFC_SAFE_NAME(s_wLoopCounter)) {                                 \
         __usage__ = (float)((double)PERFC_SAFE_NAME(s_lTotal)                   \
                         / (double)(     get_system_ticks()                      \
