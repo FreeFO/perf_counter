@@ -352,11 +352,11 @@
 #define __PERF_COUNTER__ 1
               </RTE_Components_h>
             </component>
-            <component Cclass="Utilities" Cversion="1.1.0" Cgroup="perf_counter" Csub="Porting" Cvariant="User Defined" isDefaultVariant="false" condition="perf_counter">
+            <component Cclass="Utilities" Cversion="1.2.0" Cgroup="perf_counter" Csub="Porting" Cvariant="User Defined" isDefaultVariant="false" condition="perf_counter">
               <description>A user define system timer</description>
               <files>
-                <file category="sourceC"        name="template/perfc_port_user.c" attr="config"  version="1.1.0"/>
-                <file category="header"         name="template/perfc_port_user.h" attr="config"  version="1.1.0"/>
+                <file category="sourceC"        name="template/perfc_port_user.c" attr="config"  version="1.2.0"/>
+                <file category="header"         name="template/perfc_port_user.h" attr="config"  version="1.2.0"/>
               </files>
               <RTE_Components_h>
 
@@ -469,7 +469,7 @@ extern void __rt_thread_scheduler_hook(struct rt_thread *from, struct rt_thread 
               </Pre_Include_Global_h>
             </component>
             
-            <component Cclass="Utilities" Cversion="2.4.1" Cgroup="perf_counter" Csub="ThreadX Patch" condition="perf_counter">
+            <component Cclass="Utilities" Cversion="2.5.0" Cgroup="perf_counter" Csub="ThreadX Patch" condition="perf_counter">
               <description>A Patch for ThreadX</description>
               <files>
                 <file category="sourceC"    name="os/perf_os_patch_threadx.c"/>
