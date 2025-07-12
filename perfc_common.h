@@ -437,10 +437,6 @@ extern "C" {
                         " SP: [0x%08x] Stack Base: [0x%08x]\r\n",               \
                         PERFC_SAFE_NAME(nSP),                                   \
                         (uintptr_t)(__perfc_stack_base));                       \
-                } else {                                                        \
-                    size_t __stack_used_max__ = (size_t)-1;                     \
-                    UNUSED_PARAM(__stack_used_max__);                           \
-                    __VA_ARGS__;                                                \
                 }                                                               \
             } else {                                                            \
                 PERFC_SAFE_NAME(__stack_used__)                                 \
@@ -452,19 +448,20 @@ extern "C" {
                     PERFC_SAFE_NAME(s_nStackUsedMax)                            \
                         = PERFC_SAFE_NAME(__stack_used__);                      \
                                                                                 \
-                    size_t __stack_used_max__ = PERFC_SAFE_NAME(__stack_used__);\
-                    UNUSED_PARAM(__stack_used_max__);                           \
-                                                                                \
                     if (__PLOOC_VA_NUM_ARGS(__VA_ARGS__) == 0) {                \
                         __perf_counter_printf__(                                \
                             "\r\n-------------------------------------\r\n"     \
                             __STR                                               \
                             " Stack Used Max: %d bytes\r\n",                    \
-                            __stack_used_max__);                                \
-                    } else {                                                    \
-                        __VA_ARGS__;                                            \
+                            PERFC_SAFE_NAME(__stack_used__));                   \
                     }                                                           \
                 }                                                               \
+            }                                                                   \
+            if (__PLOOC_VA_NUM_ARGS(__VA_ARGS__) != 0) {                        \
+                size_t __stack_used_max__                                       \
+                    = PERFC_SAFE_NAME(s_nStackUsedMax);                         \
+                UNUSED_PARAM(__stack_used_max__);                               \
+                __VA_ARGS__;                                                    \
             }                                                                   \
         })
 
