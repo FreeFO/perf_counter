@@ -173,6 +173,8 @@ int main (void)
         }) {
         perfc_delay_us(1000ul);
     }
+    
+    perfc_delay_ms(500);
 
     __perf_counter_printf__("\r\n delay_us(1000ul) takes %d cycles\r\n", (int)iCycleResult);
 
