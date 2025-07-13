@@ -14,7 +14,7 @@ A dedicated template is provided to port the perf_counter to different architect
   - Measures **RAW / True** cycles used for specified code segment inside a thread, **i.e. scheduling cost are removed**. 
   - Measure **RAW/True** cycles used for a data-process-path across multiple threads.
 - **Easy to use**
-  - Helper macros: `__cycleof__()` , `__super_loop_monitor__()` , `__cpu_usage__()`, `__cpu_perf__()`, `__stack_usage__()`, `__stack_usage_max__()' etc.
+  - Helper macros: `__cycleof__()` , `__super_loop_monitor__()` , `__cpu_usage__()`, `__cpu_perf__()`, `__stack_usage__()`, `__stack_usage_max__()` etc.
   - Helper functions: `start_cycle_counter()`, `stop_cycle_counter()` etc.
 - Enable a broader processor architecture support
   - **Support ALL Cortex-M processors**
