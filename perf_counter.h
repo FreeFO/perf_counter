@@ -404,7 +404,7 @@ __asm(".global __ensure_systick_wrapper\n\t");
 
 
 #if __C_LANGUAGE_EXTENSIONS_PERFC_COROUTINE__
-#   define perfc_delay_ms(__ms, ...)    __perfc_delay_ms((__ms), (NULL##__VA_ARGS__))
+#   define perfc_delay_ms(__ms, ...)    __perfc_delay_ms((__ms), (NULL,##__VA_ARGS__))
 #endif
 
 /*! @} */
