@@ -257,31 +257,36 @@ extern "C" {
 #define __PERFC_CONNECT2(__A, __B)                        __A##__B
 #define __PERFC_CONNECT3(__A, __B, __C)                   __A##__B##__C
 #define __PERFC_CONNECT4(__A, __B, __C, __D)              __A##__B##__C##__D
-#define __PERFC_CONNECT5(__A, __B, __C, __D, __E)         __A##__B##__C##__D##__E
-#define __PERFC_CONNECT6(__A, __B, __C, __D, __E, __F)    __A##__B##__C##__D##__E##__F
-#define __PERFC_CONNECT7(__A, __B, __C, __D, __E, __F, __G)                           \
-                                                    __A##__B##__C##__D##__E##__F##__G
-#define __PERFC_CONNECT8(__A, __B, __C, __D, __E, __F, __G, __H)                      \
-                                                    __A##__B##__C##__D##__E##__F##__G##__H
-#define __PERFC_CONNECT9(__A, __B, __C, __D, __E, __F, __G, __H, __I)                 \
-                                                    __A##__B##__C##__D##__E##__F##__G##__H##__I
+#define __PERFC_CONNECT5(__A, __B, __C, __D, __E)                               \
+                                    __A##__B##__C##__D##__E
+#define __PERFC_CONNECT6(__A, __B, __C, __D, __E, __F)                          \
+                                    __A##__B##__C##__D##__E##__F
+#define __PERFC_CONNECT7(__A, __B, __C, __D, __E, __F, __G)                     \
+                                    __A##__B##__C##__D##__E##__F##__G
+#define __PERFC_CONNECT8(__A, __B, __C, __D, __E, __F, __G, __H)                \
+                                    __A##__B##__C##__D##__E##__F##__G##__H
+#define __PERFC_CONNECT9(__A, __B, __C, __D, __E, __F, __G, __H, __I)           \
+                                    __A##__B##__C##__D##__E##__F##__G##__H##__I
 
-#define ALT_PERFC_CONNECT2(__A, __B)              __PERFC_CONNECT2(__A, __B)
-#define PERFC_CONNECT2(__A, __B)                  __PERFC_CONNECT2(__A, __B)
-#define PERFC_CONNECT3(__A, __B, __C)             __PERFC_CONNECT3(__A, __B, __C)
-#define PERFC_CONNECT4(__A, __B, __C, __D)        __PERFC_CONNECT4(__A, __B, __C, __D)
-#define PERFC_CONNECT5(__A, __B, __C, __D, __E)   __PERFC_CONNECT5(__A, __B, __C, __D, __E)
-#define PERFC_CONNECT6(__A, __B, __C, __D, __E, __F)                                  \
-                                            __PERFC_CONNECT6(__A, __B, __C, __D, __E, __F)
-#define PERFC_CONNECT7(__A, __B, __C, __D, __E, __F, __G)                             \
-                                            __PERFC_CONNECT7(__A, __B, __C, __D, __E, __F, __G)
-#define PERFC_CONNECT8(__A, __B, __C, __D, __E, __F, __G, __H)                        \
-                                            __PERFC_CONNECT8(__A, __B, __C, __D, __E, __F, __G, __H)
-#define PERFC_CONNECT9(__A, __B, __C, __D, __E, __F, __G, __H, __I)                   \
-                                            __PERFC_CONNECT9(__A, __B, __C, __D, __E, __F, __G, __H, __I)
+#define ALT_PERFC_CONNECT2(__A, __B)        __PERFC_CONNECT2(__A, __B)
+#define PERFC_CONNECT2(__A, __B)            __PERFC_CONNECT2(__A, __B)
+#define PERFC_CONNECT3(__A, __B, __C)       __PERFC_CONNECT3(__A, __B, __C)
+#define PERFC_CONNECT4(__A, __B, __C, __D)                                      \
+                __PERFC_CONNECT4(__A, __B, __C, __D)
+#define PERFC_CONNECT5(__A, __B, __C, __D, __E)                                 \
+                __PERFC_CONNECT5(__A, __B, __C, __D, __E)
+#define PERFC_CONNECT6(__A, __B, __C, __D, __E, __F)                            \
+                __PERFC_CONNECT6(__A, __B, __C, __D, __E, __F)
+#define PERFC_CONNECT7(__A, __B, __C, __D, __E, __F, __G)                       \
+                __PERFC_CONNECT7(__A, __B, __C, __D, __E, __F, __G)
+#define PERFC_CONNECT8(__A, __B, __C, __D, __E, __F, __G, __H)                  \
+                __PERFC_CONNECT8(__A, __B, __C, __D, __E, __F, __G, __H)
+#define PERFC_CONNECT9(__A, __B, __C, __D, __E, __F, __G, __H, __I)             \
+                __PERFC_CONNECT9(__A, __B, __C, __D, __E, __F, __G, __H, __I)
 
-#define PERFC_CONNECT(...)                                                            \
-            ALT_PERFC_CONNECT2(PERFC_CONNECT, __PLOOC_VA_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
+#define PERFC_CONNECT(...)                                                      \
+            ALT_PERFC_CONNECT2( PERFC_CONNECT,                                  \
+                                __PLOOC_VA_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
 
 #define SAFE_NAME(__NAME)           PERFC_CONNECT3(__,__NAME,__LINE__)
 #define PERFC_SAFE_NAME(__name)     PERFC_CONNECT3(__,__name,__LINE__)

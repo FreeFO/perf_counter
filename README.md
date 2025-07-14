@@ -1,4 +1,4 @@
-# perf_counter (v2.5.0-dev)
+# perf_counter (v2.5.0)
 A dedicated performance counter mainly for micro-controllers. 
 
 For Cortex-M processors, the Systick will be used by default. The `perf_counter` shares the SysTick with users' original SysTick function(s) without interfering with it. This library will bring new functionalities, such as performance counter,` perfc_delay_us`, `perfc_delay_ms` and `clock()` service defined in `time.h`.
@@ -14,7 +14,7 @@ A dedicated template is provided to port the perf_counter to different architect
   - Measures **RAW / True** cycles used for specified code segment inside a thread, **i.e. scheduling cost are removed**. 
   - Measure **RAW/True** cycles used for a data-process-path across multiple threads.
 - **Easy to use**
-  - Helper macros: `__cycleof__()` , `__super_loop_monitor__()` , `__cpu_usage__()`, `__cpu_perf__()`, `__stack_usage__()`, `__stack_usage_max__()` etc.
+  - Helper macros: `__cycleof__()` , `__super_loop_monitor__()` , `__cpu_usage__()`, `__cpu_perf__() `etc.
   - Helper functions: `start_cycle_counter()`, `stop_cycle_counter()` etc.
 - Enable a broader processor architecture support
   - **Support ALL Cortex-M processors**
@@ -55,12 +55,12 @@ A dedicated template is provided to port the perf_counter to different architect
     - simple overload feature of OOPC made out of ANSI-C99, `__PLOOC_VA_NUM_ARGS()`.
     - ...
   - A dedicated macro `__perfc_sync_barrier__()` for code barrier. 
-  - **[new]** Adds a macro `__stack_usage__()` to measure the stack usage for a given code segment.
+  - **[new]** Adds a macro `__stack_usage__()` and `__stack_usage_max__()` to measure the stack usage for a given code segment.
 - **[new]** Adds C Language Extensions
   - Adds Coroutine support
     - Adds watermark to stack and users can call `perfc_coroutine_stack_remain()` to get the stack usage info.
     - Defining macro `__PERFC_COROUTINE_NO_STACK_CHECK__` in **compilation command line** disables the stack-checking feature. 
-  - Adds ProtoThread support with/without the coroutine.
+  - Adds protoThread support with/without the coroutine.
 
 
 ### Updates

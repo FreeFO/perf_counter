@@ -49,7 +49,7 @@ extern "C" {
 #define __PERF_COUNTER_VER_MINOR__          5
 #define __PERF_COUNTER_VER_REVISE__         0
 
-#define __PERF_COUNTER_VER_STR__            "dev"
+#define __PERF_COUNTER_VER_STR__            ""
 
 #define __PER_COUNTER_VER__    (__PERF_COUNTER_VER_MAJOR__ * 10000ul            \
                                +__PERF_COUNTER_VER_MINOR__ * 100ul              \
@@ -343,8 +343,8 @@ __asm(".global __ensure_systick_wrapper\n\t");
  * \return bool whether it is timeout
  */
 #define perfc_is_time_out_ms(...)                                               \
-            PERFC_CONNECT2(perfc_is_time_out_ms, __PLOOC_VA_NUM_ARGS(__VA_ARGS__))    \
-                (__VA_ARGS__)
+            PERFC_CONNECT2( perfc_is_time_out_ms,                               \
+                            __PLOOC_VA_NUM_ARGS(__VA_ARGS__)) (__VA_ARGS__)
 
 /*!
  * \brief set an alarm with given period in us and check the status
