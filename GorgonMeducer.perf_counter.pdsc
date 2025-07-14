@@ -19,6 +19,16 @@
     <release version="9.9.9" tag="9.9.9">
       Active development ...
     </release>
+    <release date="2025-07-14" version="2.5.0" tag="v2.5.0" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.5.0/GorgonMeducer.perf_counter.2.5.0.pack">
+      Release v2.5.0
+      - Adds a helper service for coroutines
+      - Adds a coroutine based protoThread code template
+      - Adds prefix 'perfc_' to APIs and Macros
+      - Supports feed the watchdog in perfc_delay_ms(), originally called delay_ms()
+      - Supports yield from perfc_delay_ms() with coroutine's help
+      - Adds __stack_usage__() and __stack_usage_max__()
+      - Other minor changes
+    </release>
     <release date="2024-12-08" version="2.4.0" tag="v2.4.0" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.4.0/GorgonMeducer.perf_counter.2.4.0.pack">
       - Avoid time roll-back in some rare cases
       - Add macros for protoThread
