@@ -125,7 +125,6 @@ extern "C" {
 #   define dimof(__array)          (sizeof(__array)/sizeof(__array[0]))
 #endif
 
-
 #ifndef safe_atom_code
 #   define safe_atom_code()                                                     \
             perfc_using(  perfc_global_interrupt_status_t SAFE_NAME(temp) =     \
@@ -138,10 +137,6 @@ extern "C" {
             perfc_using(  perfc_global_interrupt_status_t SAFE_NAME(temp) =     \
                         perfc_port_disable_global_interrupt(),                  \
                     perfc_port_resume_global_interrupt(SAFE_NAME(temp)))
-#endif
-
-#ifndef __perf_counter_printf__
-#   define __perf_counter_printf__      printf
 #endif
 
 /* deprecated macro for backward compatibility */

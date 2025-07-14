@@ -374,6 +374,10 @@ extern "C" {
                             __PLOOC_VA_NUM_ARGS(__VA_ARGS__))                   \
                                 (__VA_ARGS__)
 
+#ifndef __perf_counter_printf__
+#   define __perf_counter_printf__      printf
+#endif
+
 /*!
  * \brief measure the stack usage of the given code segement
  * \param[in] __STR a name for this measurement
