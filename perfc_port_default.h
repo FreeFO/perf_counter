@@ -32,7 +32,7 @@
 #   define __perfc_sync_barrier__(...)         do {__DSB();__ISB();} while(0)
 #endif
 
-#if !defined(__PERFC_NO_STACK_CHECK_IN_ISR__)
+#if defined(__PERFC_STACK_CHECK_IN_ISR__)
 
 #   define __ISR(__ISR_NAME, __STACK_SIZE_HINT)                                 \
 volatile                                                                        \
@@ -42,10 +42,12 @@ extern void __origin_##__ISR_NAME (void);                                       
 void __ISR_NAME(void)                                                           \
 {                                                                               \
     uint32_t wEXCRETURN;                                                        \
+    __disable_irq();                                                            \
     __ASM volatile ("mov %0, lr"  : "=r" (wEXCRETURN) );                        \
     bool bExtendedStackFrame = !(wEXCRETURN & (1 << 4));                        \
                                                                                 \
     uintptr_t nStackLimit = __perfc_port_get_sp() - (__STACK_SIZE_HINT);        \
+    __enable_irq();                                                             \
     __stack_usage_max__(#__ISR_NAME, nStackLimit,                               \
         {                                                                       \
             bExtendedStackFrame                                                 \
