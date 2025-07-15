@@ -42,46 +42,6 @@ static volatile uint32_t s_wMSCounter = 0;
   SysTick / Timer0 IRQ Handler
  *----------------------------------------------------------------------------*/
 
-//__STATIC_FORCEINLINE
-//uint32_t __get_EXC_RETURN(void)
-//{
-//    uint32_t wResult;
-
-//    __ASM volatile ("mov %0, lr"  : "=r" (wResult) );
-//    return (wResult);
-//}
-
-
-
-#define ISR(__ISR_NAME, __STACK_SIZE_HINT)                                      \
-volatile                                                                        \
-uint32_t g_w##__ISR_NAME##_StackUsage = 0;                                      \
-                                                                                \
-extern void __origin_##__ISR_NAME (void);                                       \
-void __ISR_NAME(void)                                                           \
-{                                                                               \
-    uint32_t wEXCRETURN;                                                        \
-    __ASM volatile ("mov %0, lr"  : "=r" (wEXCRETURN) );                        \
-    bool bExtendedStackFrame = !(wEXCRETURN & (1 << 4));                        \
-                                                                                \
-    __stack_usage_max__(#__ISR_NAME,                                            \
-                        (__perfc_port_get_sp() - (__STACK_SIZE_HINT)),          \
-    {                                                                           \
-        bExtendedStackFrame = bExtendedStackFrame && !(FPU->FPCCR & 1<<0);      \
-        g_wSysTick_Handler_StackUsage = __stack_used_max__                      \
-                                      + 8 * sizeof(uint32_t)                    \
-                                      + (   bExtendedStackFrame                 \
-                                        ?   18 * sizeof(uint32_t)               \
-                                        : 0);                                   \
-    }                                                                           \
-    ) {                                                                         \
-        __origin_##__ISR_NAME();                                                \
-    }                                                                           \
-}                                                                               \
-                                                                                \
-void __origin_##__ISR_NAME (void)
-
-
 ISR(SysTick_Handler, 512)
 {
     if (s_wMSCounter) {
