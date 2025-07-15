@@ -473,7 +473,7 @@ bool perfc_stack_fill(uintptr_t nSP, uintptr_t nStackLimit)
     }
 
     uint32_t * pwStackPointer = (uint32_t *) nStackLimit;
-    while((uintptr_t)pwStackPointer <= nSP) {
+    while((uintptr_t)pwStackPointer < nSP) {
         *pwStackPointer++ = 0xDEADBEEF;
     }
     
