@@ -222,10 +222,9 @@ int main (void)
             perfc_delay_us(30000);
         }
 
-    extern uint32_t Image$$ARM_LIB_STACK$$Base[];
+        extern uint32_t Image$$ARM_LIB_STACK$$Base[];
 
-    //__stack_usage__("LED", Image$$ARM_LIB_STACK$$Base) {
-    __IRQ_SAFE {
+        //__stack_usage__("LED", Image$$ARM_LIB_STACK$$Base) {
         __stack_usage__("LED", Image$$ARM_LIB_STACK$$Base) {
             float fUsage = 0;
             __cpu_usage__(10, {
@@ -237,14 +236,13 @@ int main (void)
 
             perfc_delay_us(20000);
         }
-    }
 
-    fsm_rt_t tResult = perfc_coroutine_call((perfc_coroutine_t *)&s_tExampleCPT[0]).nResult;
-    if (fsm_rt_cpl == tResult) {
-        size_t tStackRemain 
-            = perfc_coroutine_stack_remain((perfc_coroutine_t *)&s_tExampleCPT[0]);
-        __perf_counter_printf__("\r\nCoroutine Stack Remain: %d\r\n", tStackRemain);
-    }
+        fsm_rt_t tResult = perfc_coroutine_call((perfc_coroutine_t *)&s_tExampleCPT[0]).nResult;
+        if (fsm_rt_cpl == tResult) {
+            size_t tStackRemain 
+                = perfc_coroutine_stack_remain((perfc_coroutine_t *)&s_tExampleCPT[0]);
+            __perf_counter_printf__("\r\nCoroutine Stack Remain: %d\r\n", tStackRemain);
+        }
 
         perfc_coroutine_call((perfc_coroutine_t *)&s_tExampleCPT[1]);
 
