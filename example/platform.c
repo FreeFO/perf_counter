@@ -42,13 +42,42 @@ static volatile uint32_t s_wMSCounter = 0;
   SysTick / Timer0 IRQ Handler
  *----------------------------------------------------------------------------*/
 
-void SysTick_Handler (void)
+__STATIC_FORCEINLINE
+uint32_t __get_EXC_RETURN(void)
+{
+    uint32_t wResult;
+
+    __ASM volatile ("mov %0, lr"  : "=r" (wResult) );
+    return (wResult);
+}
+
+
+
+
+void __origin_SysTick_Handler (void)
 {
     if (s_wMSCounter) {
         s_wMSCounter--;
     }
 
     systimer_1ms_handler();
+}
+
+volatile 
+uint32_t g_wSysTick_Handler_StackUsage = 0;
+
+void SysTick_Handler(void)
+{
+    uint32_t wEXCRETURN = __get_EXC_RETURN();
+    extern uint32_t Image$$ARM_LIB_STACK$$Base[];
+    
+    __stack_usage_max__("SysTick_Handler", (__perfc_port_get_sp() - 512)
+    ,{
+        g_wSysTick_Handler_StackUsage = __stack_used_max__;
+    }
+    ) {
+        __origin_SysTick_Handler();
+    }
 }
 
 /*! \brief initialise platform before main()
@@ -59,8 +88,8 @@ void platform_init(void)
     SystemCoreClockUpdate();
 
     /* Generate interrupt each 1 ms  */
-    SysTick_Config(SystemCoreClock / 1000);
-    //perfc_init(false);
+    //SysTick_Config(SystemCoreClock / 1000);
+    perfc_init(false);
     
 #if defined(RTE_Compiler_EventRecorder) && defined(RTE_Compiler_IO_STDOUT_EVR)
     EventRecorderInitialize(0,1);
