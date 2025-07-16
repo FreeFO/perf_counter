@@ -53,7 +53,7 @@ void __ISR_NAME(void)                                                           
     __enable_irq();                                                             \
     __stack_usage_max__(#__ISR_NAME, nStackLimit,                               \
         {                                                                       \
-            g_wSysTick_Handler_StackUsage = __stack_used_max__;                 \
+            g_w##__ISR_NAME##_StackUsage = __stack_used_max__;                  \
             /* the interrupted program use MPS and in the same secure domain */ \
             if (bSPSELMSP && !bCrossSecureDomain) {                             \
                 /* check FPU lazy stacking */                                   \
@@ -66,7 +66,7 @@ void __ISR_NAME(void)                                                           
                                      ?  16 * sizeof(uint32_t)                   \
                                      :  0);                                     \
                                               /* state context */               \
-                g_wSysTick_Handler_StackUsage +=    8 * sizeof(uint32_t)        \
+                g_w##__ISR_NAME##_StackUsage +=    8 * sizeof(uint32_t)         \
                                               /* FP context */                  \
                                               +     (   bExtendedStackFrame     \
                                                     ?   wFPUFrame               \
