@@ -465,6 +465,11 @@ bool perfc_stack_fill(uintptr_t nSP, uintptr_t nStackLimit)
     /* force 8bytes alignment */
     nSP &= (~((uintptr_t)0x07));
     nStackLimit = (nStackLimit + 7) & (~((uintptr_t)0x07));
+    
+    /* We don't know whether the location pointed by SP is used or not, it's 
+     * safe to ignore it
+     */
+    nSP -= 8;
 
     if (nSP <= nStackLimit) {
         /* stack overflow */
