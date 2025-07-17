@@ -64,7 +64,6 @@ extern
 void perfc_port_clear_system_timer_counter(void);
 
 /*============================ IMPLEMENTATION ================================*/
-/*============================ INCLUDES ======================================*/
 
 #if __PERFC_USE_USER_CUSTOM_PORTING__
  
