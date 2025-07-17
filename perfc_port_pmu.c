@@ -1454,7 +1454,6 @@ void perfc_port_stop_system_timer_counting(void);
 extern
 void perfc_port_clear_system_timer_counter(void);
 
-/*============================ INCLUDES ======================================*/
 /*============================ IMPLEMENTATION ================================*/
 
 
