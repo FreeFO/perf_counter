@@ -108,7 +108,6 @@ extern
 void perfc_port_clear_system_timer_counter(void);
 
 /*============================ IMPLEMENTATION ================================*/
-/*============================ INCLUDES ======================================*/
 
 void perfc_port_insert_to_system_timer_insert_ovf_handler(void)
 {
