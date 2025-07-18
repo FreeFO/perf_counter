@@ -19,6 +19,13 @@
     <release version="9.9.9" tag="9.9.9">
       Active development ...
     </release>
+    <release date="2025-07-18" version="2.5.1" tag="v2.5.1" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.5.1/GorgonMeducer.perf_counter.2.5.1.pack">
+      Release v2.5.1
+      - Adds a macro ISR() to measure the maximum stack usage of a given Cortex-M exception handler.
+      - Allows users to define the macro __PERFC_STACK_WATERMARK_U32__ to override the default watermark, i.e. 0xDEADBEEF.
+      - Fixes issues found in __stack_usage__() and __stack_usage_max__().
+      - Other minor changes.
+    </release>
     <release date="2025-07-14" version="2.5.0" tag="v2.5.0" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.5.0/GorgonMeducer.perf_counter.2.5.0.pack">
       Release v2.5.0
       - Adds a helper service for coroutines
