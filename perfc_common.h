@@ -457,7 +457,7 @@ extern "C" {
                         PERFC_SAFE_NAME(nSP),                                   \
                         (uintptr_t)(__perfc_stack_base));                       \
                 }                                                               \
-            } else {                                                            \
+            } else if (PERFC_SAFE_NAME(s_nStackUsedMax) >= 0) {                 \
                 PERFC_SAFE_NAME(__stack_used__)                                 \
                     = PERFC_SAFE_NAME(nSP)                                      \
                     - (uintptr_t)(__perfc_stack_base)                           \
