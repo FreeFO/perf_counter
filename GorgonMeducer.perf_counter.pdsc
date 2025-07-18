@@ -479,7 +479,7 @@ extern void __rt_thread_scheduler_hook(struct rt_thread *from, struct rt_thread 
               </Pre_Include_Global_h>
             </component>
             
-            <component Cclass="Utilities" Cversion="2.5.1 Cgroup="perf_counter" Csub="ThreadX Patch" condition="perf_counter">
+            <component Cclass="Utilities" Cversion="2.5.1" Cgroup="perf_counter" Csub="ThreadX Patch" condition="perf_counter">
               <description>A Patch for ThreadX</description>
               <files>
                 <file category="sourceC"    name="os/perf_os_patch_threadx.c"/>
