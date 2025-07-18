@@ -188,16 +188,18 @@ __asm(".global __ensure_systick_wrapper\n\t");
 #   define CONNECT    PERFC_CONNECT
 #endif
 
-#ifndef using
-#   define using perfc_using
-#endif
+#ifndef __cplusplus
+    #ifndef using
+    #   define using perfc_using
+    #endif
 
-#ifndef with
-#   define with perfc_with
-#endif
+    #ifndef with
+    #   define with perfc_with
+    #endif
 
-#ifndef foreach
-#   define foreach perfc_foreach
+    #ifndef foreach
+    #   define foreach perfc_foreach
+    #endif
 #endif
 /*! @} */
 
