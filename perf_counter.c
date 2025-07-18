@@ -478,7 +478,7 @@ bool perfc_stack_fill(uintptr_t nSP, uintptr_t nStackLimit)
 
     uint32_t * pwStackPointer = (uint32_t *) nStackLimit;
     while((uintptr_t)pwStackPointer < nSP) {
-        *pwStackPointer++ = 0xDEADBEEF;
+        *pwStackPointer++ = __PERFC_STACK_WATERMARK_U32__;
     }
     
     return true;
@@ -493,7 +493,7 @@ size_t perfc_stack_remain(uintptr_t nStackLimit)
             (   ((uintptr_t)(nStackLimit) + 7)
             &   (~((uintptr_t)0x07)));
     
-    while(*pdwCanary++ == 0xDEADBEEFDEADBEEFul) {
+    while(*pdwCanary++ == __PERFC_STACK_WATERMARK_U64__) {
         nDWordCount++;
     }
 
