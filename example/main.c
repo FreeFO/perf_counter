@@ -222,10 +222,10 @@ int main (void)
             perfc_delay_us(30000);
         }
 
-        extern uint32_t Image$$ARM_LIB_STACK$$Base[];
+        extern uintptr_t Image$$ARM_LIB_STACK$$Base[];
 
-        //__stack_usage__("LED", Image$$ARM_LIB_STACK$$Base) {
         __stack_usage__("LED", Image$$ARM_LIB_STACK$$Base) {
+        //__stack_usage_max__("LED", Image$$ARM_LIB_STACK$$Base) {
             float fUsage = 0;
             __cpu_usage__(10, {
                 fUsage = __usage__;
