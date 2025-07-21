@@ -185,7 +185,11 @@ __asm(".global __ensure_systick_wrapper\n\t");
 #define delay_ms(__ms)          perfc_delay_ms(__ms)
 
 #ifndef CONNECT
-#   define CONNECT    PERFC_CONNECT
+#   define CONNECT      PERFC_CONNECT
+#endif
+
+#ifndef CONNECT2
+#   define CONNECT2     PERFC_CONNECT2
 #endif
 
 #ifndef __cplusplus
