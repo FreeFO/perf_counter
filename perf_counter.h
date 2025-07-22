@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <inttypes.h>
 
 #include "perfc_common.h"
 
@@ -238,8 +239,8 @@ __asm(".global __ensure_systick_wrapper\n\t");
                     __perf_counter_printf__(                                    \
                         "------------------------------------\r\n");            \
                     __perf_counter_printf__(                                    \
-                        __STR " total cycle count: %ld [%08lx]\r\n",            \
-                            (long)_, (long)_);                                  \
+                        __STR " total cycle count: %"PRIi64" [%08"PRIX64"]\r\n",\
+                            (int64_t)_, (int64_t)_);                            \
                 } else {                                                        \
                     __VA_ARGS__                                                 \
                 };                                                              \
