@@ -178,6 +178,7 @@ __asm(".global __ensure_systick_wrapper\n\t");
  * \addtogroup Deprecated
  * @{
  */
+#if !defined(__PERFC_NO_DEPRECATED__)
 #define init_cycle_counter(__is_systimer_occupied)                              \
             perfc_init(__is_systimer_occupied)
 
@@ -205,6 +206,7 @@ __asm(".global __ensure_systick_wrapper\n\t");
     #ifndef foreach
     #   define foreach perfc_foreach
     #endif
+#endif
 #endif
 /*! @} */
 
