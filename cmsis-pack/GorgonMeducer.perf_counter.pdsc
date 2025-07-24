@@ -3,7 +3,7 @@
 <package schemaVersion="1.7.37" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.37/schema/PACK.xsd">
   <vendor>GorgonMeducer</vendor>
   <name>perf_counter</name>
-  <description>A dedicated performance counter mainly for micro-controllers. For Cortex-M processors, the SysTick will be used by default. The `perf_counter` shares the SysTick with users' original SysTick function(s) without interfering with it. This library will bring new functionalities, such as performance counter,` perfc_delay_us`, `perfc_delay_ms` and `clock()` service defined in `time.h`. A dedicated template is provided to port the perf_counter to different architectures or using a different Timer instead of SysTick in Cortex-M processors.</description>
+  <description>A dedicated performance counter mainly for micro-controllers. For Cortex-M processors, the `perf_counter` uses the SysTick by default. It shares the SysTick with users' original SysTick functions without interfering with them. This library brings new functionalities, such as performance counter, `perfc_delay_us()`, `perfc_delay_ms()` and implements `clock()` defined in `time.h`. It provides a template for porting the `perf_counter` to different architectures or using a different Timer instead of SysTick in Cortex-M processors.</description>
   <url>https://raw.githubusercontent.com/GorgonMeducer/perf_counter/CMSIS-Pack/cmsis-pack/</url>
   <supportContact>https://github.com/GorgonMeducer/perf_counter/issues</supportContact>
   <license>LICENSE</license>
@@ -16,6 +16,15 @@
   <repository type="git">https://github.com/GorgonMeducer/perf_counter.git</repository>
   
   <releases>
+    <release date="2025-07-25" version="2.5.2" tag="v2.5.2" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.5.2/GorgonMeducer.perf_counter.2.5.2.pack" >
+      Release v2.5.2
+      - Fixes the support for Arm Compiler 5
+      - Improves the compatibility with C++
+      - Adds support for the hardware architectures that use growing-upward stacks
+      - Uses format specifiers defined in inttypes.h
+      - Allows users to disable the aliases of the deprecated APIs
+      - Fixes GCC support
+    </release>
     <release date="2025-07-18" version="2.5.1" tag="v2.5.1" url="https://github.com/GorgonMeducer/perf_counter/releases/download/v2.5.1/GorgonMeducer.perf_counter.2.5.1.pack">
       Release v2.5.1
       - Adds a macro ISR() to measure the maximum stack usage of a given Cortex-M exception handler.
@@ -170,6 +179,12 @@
             <description>GNU Tools for Arm Embedded Processors.</description>
             <accept Tcompiler="GCC"/>
             <accept Tcompiler="CLANG"/>
+        </condition>
+        
+        <condition id="No GCC">
+            <description>Deny GNU Tools for Arm Embedded Processors.</description>
+            <deny Tcompiler="GCC"/>
+            <accept condition="Arm Compiler"/>
         </condition>
 
         <condition id="Armv8.1-M Processors">
@@ -331,10 +346,10 @@
   -->
 
     <components>
-            <component Cclass="Utilities" Cversion="2.5.1" Cgroup="perf_counter" Csub="Core" Cvariant="Source" isDefaultVariant="true" condition="CMSIS-CORE">
+            <component Cclass="Utilities" Cversion="2.5.2" Cgroup="perf_counter" Csub="Core" Cvariant="Source" isDefaultVariant="true" condition="CMSIS-CORE">
               <description>A dedicated performance counter for Cortex-M systick.</description>
               <files>
-                <file category="preIncludeGlobal"   name="perfc_common.h"/>
+                <file category="preIncludeGlobal"   name="perfc_common.h"               condition="No GCC"/>
                 <file category="header"             name="perf_counter.h"/>
                 <file category="sourceC"            name="perf_counter.c" />
                 <file category="sourceC"            name="perfc_port_default.c" />
@@ -353,10 +368,10 @@
               </Pre_Include_Global_h>
             </component>
 
-            <component Cclass="Utilities" Cversion="2.5.1" Cgroup="perf_counter" Csub="Core" Cvariant="SourceNoWrapper" isDefaultVariant="false" condition="CMSIS-CORE">
+            <component Cclass="Utilities" Cversion="2.5.2" Cgroup="perf_counter" Csub="Core" Cvariant="SourceNoWrapper" isDefaultVariant="false" condition="CMSIS-CORE">
               <description>A dedicated performance counter for Cortex-M systick.</description>
               <files>
-                <file category="preIncludeGlobal"   name="perfc_common.h"/>
+                <file category="preIncludeGlobal"   name="perfc_common.h"               condition="No GCC"/>
                 <file category="header"             name="perf_counter.h"/>
                 <file category="sourceC"            name="perf_counter.c" />
                 <file category="sourceC"            name="perfc_port_default.c" />
@@ -430,7 +445,7 @@
               </Pre_Include_Global_h>
             </component>
 
-            <component Cclass="Utilities" Cversion="2.5.1" Cgroup="perf_counter" Csub="RTX5 Patch" condition="RTX5 Patch">
+            <component Cclass="Utilities" Cversion="2.5.2" Cgroup="perf_counter" Csub="RTX5 Patch" condition="RTX5 Patch">
               <description>A Patch for RTX5</description>
               <files>
                 <file category="source"     name="os/perf_os_patch_rtx5.c"/>
@@ -442,7 +457,7 @@
               </Pre_Include_Global_h>
             </component>
 
-            <component Cclass="Utilities" Cversion="2.5.1" Cgroup="perf_counter" Csub="FreeRTOS Patch" condition="perf_counter">
+            <component Cclass="Utilities" Cversion="2.5.2" Cgroup="perf_counter" Csub="FreeRTOS Patch" condition="perf_counter">
               <description>A Patch for FreeRTOS</description>
               <files>
                 <file category="sourceC"    name="os/perf_os_patch_freertos.c"/>
@@ -465,7 +480,7 @@ extern void __freertos_evr_on_task_switched_in(void *ptTCB, unsigned int uxTopPr
               </Pre_Include_Global_h>
             </component>
             
-            <component Cclass="Utilities" Cversion="2.5.1" Cgroup="perf_counter" Csub="RT-Thread Patch" condition="perf_counter">
+            <component Cclass="Utilities" Cversion="2.5.2" Cgroup="perf_counter" Csub="RT-Thread Patch" condition="perf_counter">
               <description>A Patch for RT-Thread</description>
               <files>
                 <file category="sourceC"    name="os/perf_os_patch_rt_thread.c"/>
@@ -483,7 +498,7 @@ extern void __rt_thread_scheduler_hook(struct rt_thread *from, struct rt_thread 
               </Pre_Include_Global_h>
             </component>
             
-            <component Cclass="Utilities" Cversion="2.5.1" Cgroup="perf_counter" Csub="ThreadX Patch" condition="perf_counter">
+            <component Cclass="Utilities" Cversion="2.5.2" Cgroup="perf_counter" Csub="ThreadX Patch" condition="perf_counter">
               <description>A Patch for ThreadX</description>
               <files>
                 <file category="sourceC"    name="os/perf_os_patch_threadx.c"/>
@@ -500,7 +515,7 @@ extern void __rt_thread_scheduler_hook(struct rt_thread *from, struct rt_thread 
         <component Cclass="Language Extension" Cgroup="Coroutine" Cversion="1.0.0" condition="perf_counter">
           <description>A C software infrastructure for coroutines.</description>
           <files>
-            <file category="preIncludeGlobal"   name="__perfc_task_common.h"/>
+            <file category="preIncludeGlobal"   name="__perfc_task_common.h"    condition="No GCC"/>
             <file category="sourceC"            name="perfc_task_coroutine.c"/>
           </files>
           <Pre_Include_Global_h>
