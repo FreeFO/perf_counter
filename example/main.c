@@ -222,9 +222,15 @@ int main (void)
             perfc_delay_us(30000);
         }
 
+    #if __IS_COMPILER_ARM_COMPILER__
         extern uintptr_t Image$$ARM_LIB_STACK$$Base[];
+        uintptr_t nStackLimit = (uintptr_t)Image$$ARM_LIB_STACK$$Base;
+    #else
+        extern uintptr_t __StackLimit[];
+        uintptr_t nStackLimit = (uintptr_t)__StackLimit;
+    #endif
 
-        __stack_usage__("LED", Image$$ARM_LIB_STACK$$Base) {
+        __stack_usage__("LED", nStackLimit) {
         //__stack_usage_max__("LED", Image$$ARM_LIB_STACK$$Base) {
             float fUsage = 0;
             __cpu_usage__(10, {

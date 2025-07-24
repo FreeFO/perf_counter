@@ -174,6 +174,12 @@
             <accept Tcompiler="GCC"/>
             <accept Tcompiler="CLANG"/>
         </condition>
+        
+        <condition id="No GCC">
+            <description>Deny GNU Tools for Arm Embedded Processors.</description>
+            <deny Tcompiler="GCC"/>
+            <accept condition="Arm Compiler"/>
+        </condition>
 
         <condition id="Armv8.1-M Processors">
             <accept  Dcore="ARMV81MML"/>
@@ -337,7 +343,7 @@
             <component Cclass="Utilities" Cversion="2.5.2" Cgroup="perf_counter" Csub="Core" Cvariant="Source" isDefaultVariant="true" condition="CMSIS-CORE">
               <description>A dedicated performance counter for Cortex-M systick.</description>
               <files>
-                <file category="preIncludeGlobal"   name="perfc_common.h"/>
+                <file category="preIncludeGlobal"   name="perfc_common.h"               condition="No GCC"/>
                 <file category="header"             name="perf_counter.h"/>
                 <file category="sourceC"            name="perf_counter.c" />
                 <file category="sourceC"            name="perfc_port_default.c" />
@@ -359,7 +365,7 @@
             <component Cclass="Utilities" Cversion="2.5.2" Cgroup="perf_counter" Csub="Core" Cvariant="SourceNoWrapper" isDefaultVariant="false" condition="CMSIS-CORE">
               <description>A dedicated performance counter for Cortex-M systick.</description>
               <files>
-                <file category="preIncludeGlobal"   name="perfc_common.h"/>
+                <file category="preIncludeGlobal"   name="perfc_common.h"               condition="No GCC"/>
                 <file category="header"             name="perf_counter.h"/>
                 <file category="sourceC"            name="perf_counter.c" />
                 <file category="sourceC"            name="perfc_port_default.c" />
@@ -503,7 +509,7 @@ extern void __rt_thread_scheduler_hook(struct rt_thread *from, struct rt_thread 
         <component Cclass="Language Extension" Cgroup="Coroutine" Cversion="1.0.0" condition="perf_counter">
           <description>A C software infrastructure for coroutines.</description>
           <files>
-            <file category="preIncludeGlobal"   name="__perfc_task_common.h"/>
+            <file category="preIncludeGlobal"   name="__perfc_task_common.h"    condition="No GCC"/>
             <file category="sourceC"            name="perfc_task_coroutine.c"/>
           </files>
           <Pre_Include_Global_h>
