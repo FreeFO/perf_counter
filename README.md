@@ -1,4 +1,4 @@
-# perf_counter (v2.5.2-dev)
+# perf_counter (v2.5.2)
 A dedicated performance counter mainly for micro-controllers. 
 
 For Cortex-M processors, the Systick will be used by default. The `perf_counter` shares the SysTick with users' original SysTick function(s) without interfering with it. This library will bring new functionalities, such as performance counter,` perfc_delay_us`, `perfc_delay_ms` and `clock()` service defined in `time.h`.
@@ -78,6 +78,8 @@ A dedicated template is provided to port the perf_counter to different architect
   - `using()` -> `perfc_using()`
   - `with()` -> `perfc_with()`
   - `foreach()` -> `perfc_foreach()`
+
+- **[new]** You can define the macro `__PERFC_NO_DEPRECATED__` to disable the alias of the deprecated APIs.
 
   
 
